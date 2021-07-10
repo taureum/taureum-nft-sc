@@ -23,6 +23,6 @@ contract TaureumKYCMock is AccessControl {
     }
 
     function isVerifiedUser(address addr) external view returns (bool){
-        return true;
+        return hasRole(VERIFIER_ROLE, addr);
     }
 }

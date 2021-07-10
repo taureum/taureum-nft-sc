@@ -8,6 +8,7 @@ const {
     ERC721_BALANCE_QUERY_FOR_ZERO_ADDRESS,
     NOT_OWNER_OR_APPROVED,
     TOKEN_NOT_TRANSFERABLE,
+    NFT_COUNT_MAX_EXCEEDED,
     shouldErrorContainMessage
 } = require("./helper/errors")
 
@@ -93,7 +94,7 @@ contract('TaureumNFT', (accounts) => {
 
         it("should be valid for verified accounts", async() => {
             const count = await contract.balanceOf(verifiedUser)
-            console.log(`countNFT of ${verifiedUser}: ${count}`)
+            // console.log(`countNFT of ${verifiedUser}: ${count}`)
             for (let i = 1; i <= 20 - count; i++) {
                 const result = await mintRandomToken(contract, verifiedUser, 1)
                 // console.log(result)
@@ -113,6 +114,27 @@ contract('TaureumNFT', (accounts) => {
                 await mintRandomToken(contract, zeroAddress, license)
             } catch (error) {
                 assert.equal(shouldErrorContainMessage(error, ERC721_BALANCE_QUERY_FOR_ZERO_ADDRESS), true)
+            }
+        })
+
+        it("unVerifiedUser can only mint upto 10 NFTs", async() => {
+            const count = await contract.balanceOf(notVerifiedUser)
+            // console.log(`countNFT of the unVerifiedUser ${notVerifiedUser}: ${count}`)
+            for (let i = 1; i <= 10 - count; i++) {
+                const result = await mintRandomToken(contract, notVerifiedUser, crypto.randomInt(0, 2))
+
+                const event = result.logs[0].args
+                assert.equal(event.to, notVerifiedUser, "to is incorrect")
+
+                const balance = await contract.balanceOf(notVerifiedUser)
+                assert.equal(balance, parseInt(count) + parseInt(i), "balance is incorrect")
+            }
+
+            try {
+                let license = crypto.randomInt(0, 2)
+                await mintRandomToken(contract, notVerifiedUser, license)
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, NFT_COUNT_MAX_EXCEEDED), true)
             }
         })
     })

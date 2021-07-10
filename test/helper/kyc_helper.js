@@ -5,7 +5,7 @@ async function addVerifiedUser(verifiedUser) {
     try
     {
         await contract.addVerifier(verifiedUser);
-        console.log(`addVerifier ${verifiedUser} successfully!!`)
+        // console.log(`addVerifier ${verifiedUser} successfully!!`)
     } catch (error) {
         throw(error)
     }
