@@ -25,6 +25,11 @@ contract TaureumNFT is ERC721 {
     mapping(uint256 => string) internal idToUri;
 
     /**
+     * @dev Mapping from NFT ID to its first owner.
+     */
+    mapping(uint256 => address) internal idToFirstOwner;
+
+    /**
      * @dev Mapping from NFT URI to its existence.
      */
     mapping(string => bool) internal uriExists;
@@ -77,7 +82,7 @@ contract TaureumNFT is ERC721 {
     }
 
     /**
-     * @dev Create a new TaureumNFT contract and assign the only ADMIN_ROLE to _onlyAdmin.
+     * @dev Create a new TaureumNFT contract and assign the KYCAddress to _KYCAddress.
      *
      * TODO: change the default name and symbol.
      */
@@ -98,29 +103,32 @@ contract TaureumNFT is ERC721 {
     /**
       * @dev Mint a new NFT.
       * It throws an exception if
-      *    - _uri does not exist.
-      *    - _to cannot receive NFTs.
-      * @param _to The address that will own the minted NFT.
-      * @param _uri The URI consists of metadata description of the NFT on the IPFS (without prefix).
+      *    - uri does not exist.
+      *    - to cannot receive NFTs.
+      * @param to The address that will own the minted NFT.
+      * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
+      * @param license The license of the minting NFT (0 or 1).
+      * @param expiryDate The expiry date of the minting NFT.
       */
     function mint(
-        address _to,
-        string calldata _uri,
+        address to,
+        string calldata uri,
         uint8 license,
         uint expiryDate
     )
     public
-    notExists(_uri)
-    canReceiveNFT(_to)
+    notExists(uri)
+    canReceiveNFT(to)
     {
         require(license < 2, "LICENSE_MUST_BE_O_OR_1");
         require(expiryDate > block.timestamp, "EXPIRY_DATE_NOT_VALID");
         _tokenIds.increment();
 
         uint256 id = _tokenIds.current();
-        super._mint(_to, id);
-        _setTokenUri(id, _uri);
-        uriExists[_uri] = true;
+        super._mint(to, id);
+        _setTokenUri(id, uri);
+        uriExists[uri] = true;
+        idToFirstOwner[id] = to;
         idToProperty[id] = abi.encodePacked(license, expiryDate);
     }
 
@@ -138,11 +146,12 @@ contract TaureumNFT is ERC721 {
      * @dev Check if an NFT token is transferable.
      * @param _tokenId The NFT tokenID to check.
      */
-    function isTransferable(uint256 _tokenId) public view returns (bool) {
+    function isTransferable(uint256 _tokenId) internal view returns (bool) {
+        address firstOwner = idToFirstOwner[_tokenId];
         bytes memory tokenData = getTokenData(_tokenId);
 
-        uint8 licenseType = uint8(tokenData[1]);
-        if (licenseType != 1) {
+        uint8 licenseType = uint8(tokenData[0]);
+        if (licenseType != 1 && msg.sender != firstOwner) {
             return false;
         }
 
