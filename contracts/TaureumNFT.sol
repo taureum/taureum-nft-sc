@@ -82,6 +82,11 @@ contract TaureumNFT is ERC721 {
     }
 
     /**
+     * @dev Emitted when `tokenId` token is minted for `to`.
+     */
+    event Mint(address indexed to, uint256 indexed tokenId, string uri, uint8 license, uint expiryDate);
+
+    /**
      * @dev Create a new TaureumNFT contract and assign the KYCAddress to _KYCAddress.
      *
      * TODO: change the default name and symbol.
@@ -130,6 +135,8 @@ contract TaureumNFT is ERC721 {
         uriExists[uri] = true;
         idToFirstOwner[id] = to;
         idToProperty[id] = abi.encodePacked(license, expiryDate);
+
+        emit Mint(to, id, uri, license, expiryDate);
     }
 
     /**
