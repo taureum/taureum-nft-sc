@@ -1,11 +1,16 @@
 const TaureumKYCMock = artifacts.require("TaureumKYCMock");
 const TaureumNFT = artifacts.require("TaureumNFT");
 
-module.exports = function (deployer) {
-    deployer.deploy(TaureumKYCMock).then(async() => {
-        kycContractAddress = await TaureumKYCMock.deployed().address
-        console.log("KYC Contract Address", kycContractAddress)
+module.exports = async function (deployer) {
+    let kycContractAddress
 
-        deployer.deploy(TaureumNFT, kycContractAddress)
-    });
+    await deployer.deploy(TaureumKYCMock)
+    kycContract = await TaureumKYCMock.deployed()
+    kycContractAddress = kycContract.address
+    console.log("KYC contract deployed at address", kycContractAddress)
+
+    await deployer.deploy(TaureumNFT, kycContractAddress);
+    mainContract = await TaureumNFT.deployed();
+    mainContractAddress = await mainContract.address
+    console.log("Main contract deployed at address", mainContractAddress)
 };
