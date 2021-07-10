@@ -6,7 +6,7 @@ async function mintToken(contract, owner, uri, license, expiryDate) {
 }
 
 async function mintRandomToken(contract, owner, license) {
-    let uri = crypto.randomBytes(30).toString('hex');
+    let uri = crypto.randomBytes(32).toString('hex');
     let expiryDate = "10000000000000000000";
     if (owner === '0x0000000000000000000000000000000000000000') {
         return await contract.mint(owner, uri, license, expiryDate)

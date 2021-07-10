@@ -9,6 +9,8 @@ const {
     NOT_OWNER_OR_APPROVED,
     TOKEN_NOT_TRANSFERABLE,
     NFT_COUNT_MAX_EXCEEDED,
+    URI_EXISTS,
+    EXPIRY_DATE_NOT_VALID,
     shouldErrorContainMessage
 } = require("./helper/errors")
 
@@ -64,7 +66,7 @@ contract('TaureumNFT', (accounts) => {
     })
 
     describe('minting', async() => {
-        it("creates a new token", async() => {
+        it("create a simple NFT", async() => {
             let uri = "aaaaababababababababababababababababa"
             let license = 1
             let expiryDate = "10000000000000000000"
@@ -84,12 +86,29 @@ contract('TaureumNFT', (accounts) => {
             //Check owner
             const owner = await contract.ownerOf(tokenId)
             assert.equal(owner, verifiedUser, "own is invalid")
+        })
+
+        it("cannot mint duplicate URI", async() => {
+            let uri = crypto.randomBytes(32).toString('hex');
+            let license = crypto.randomInt(0, 2)
+            let expiryDate = "10000000000000000000"
+            await mintToken(contract, verifiedUser, uri, license, expiryDate)
 
             //FAIL: cannot mint same URI twice
-            await mintToken(contract, verifiedUser, uri, license, expiryDate).should.be.rejected;
+            try {
+                await mintToken(contract, verifiedUser, uri, license, expiryDate);
+                assert.equal(true, false, 'should not pass')
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, URI_EXISTS), true)
+            }
 
             //FAIL: cannot mint same URI twice, even for another account
-            await mintToken(contract, anotherVerifiedUser, uri, license, expiryDate).should.be.rejected;
+            try {
+                await mintToken(contract, anotherVerifiedUser, uri, license, expiryDate);
+                assert.equal(true, false, 'should not pass')
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, URI_EXISTS), true)
+            }
         })
 
         it("should be valid for verified accounts", async() => {
@@ -112,6 +131,7 @@ contract('TaureumNFT', (accounts) => {
             let license = crypto.randomInt(0, 2)
             try {
                 await mintRandomToken(contract, zeroAddress, license)
+                assert.equal(true, false, 'should not pass')
             } catch (error) {
                 assert.equal(shouldErrorContainMessage(error, ERC721_BALANCE_QUERY_FOR_ZERO_ADDRESS), true)
             }
@@ -133,8 +153,20 @@ contract('TaureumNFT', (accounts) => {
             try {
                 let license = crypto.randomInt(0, 2)
                 await mintRandomToken(contract, notVerifiedUser, license)
+                assert.equal(true, false, 'should not pass')
             } catch (error) {
                 assert.equal(shouldErrorContainMessage(error, NFT_COUNT_MAX_EXCEEDED), true)
+            }
+        })
+
+        it("mint with expiryDate prior to current timeStamp should be rejected", async() => {
+            let uri = crypto.randomBytes(32).toString('hex');
+            let expiryDate = Math.floor(Date.now() / 1000);
+            try {
+                await mintToken(contract, verifiedUser, uri, crypto.randomInt(0, 2), expiryDate);
+                assert.equal(true, false, 'should not pass')
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, EXPIRY_DATE_NOT_VALID), true)
             }
         })
     })
@@ -191,6 +223,7 @@ contract('TaureumNFT', (accounts) => {
             //FAIL: owner cannot transfer this token since its ownership has been transferred to newOwner
             try {
                 await contract.transferFrom(verifiedUser, newOwner, tokenId);
+                assert.equal(true, false, 'should not pass')
             } catch(error) {
                 // Should throw a NOT_OWNER_OR_APPROVED message
                 assert.equal(shouldErrorContainMessage(error, NOT_OWNER_OR_APPROVED), true)
@@ -213,6 +246,7 @@ contract('TaureumNFT', (accounts) => {
             //FAIL: newOwner cannot transfer this token since its is personal-licensed.
             try {
                 await contract.transferFrom(newOwner, verifiedUser, tokenId, {from : newOwner});
+                assert.equal(true, false, 'should not pass')
             } catch(error) {
                 // Should throw a TOKEN_NOT_TRANSFERABLE message
                 assert.equal(shouldErrorContainMessage(error, TOKEN_NOT_TRANSFERABLE), true)
@@ -248,6 +282,7 @@ contract('TaureumNFT', (accounts) => {
             //Transfer to another account
             try {
                 await contract.transferFrom(verifiedUser, newOwner, tokenId, {from: notApprovedUser})
+                assert.equal(true, false, 'should not pass')
             } catch (error) {
                 // Should throw a NOT_OWNER_OR_APPROVED message
                 assert.equal(shouldErrorContainMessage(error, NOT_OWNER_OR_APPROVED), true)
@@ -311,6 +346,7 @@ contract('TaureumNFT', (accounts) => {
             //Transfer to another account
             try {
                 await contract.transferFrom(verifiedUser, newOwner, tokenId2, {from: approvedUser})
+                assert.equal(true, false, 'should not pass')
             } catch (error) {
                 // Should throw a NOT_OWNER_OR_APPROVED message
                 assert.equal(shouldErrorContainMessage(error, NOT_OWNER_OR_APPROVED), true)
