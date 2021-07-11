@@ -91,7 +91,7 @@ contract TaureumNFT is ERC721 {
      *
      * TODO: change the default name and symbol.
      */
-    constructor(address KYCAddress) ERC721("TaureumNFT", "TauNFT") {
+    constructor(address KYCAddress) ERC721("Taureum NFT", "Taureum") {
         _KYCAddress = KYCAddress;
     }
 
