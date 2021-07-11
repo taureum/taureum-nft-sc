@@ -37,7 +37,7 @@ contract TaureumNFT is ERC721 {
     /**
      * @dev Mapping from NFT ID to the NFT property (encode the tokenData struct).
      *  - 1st byte determines the license type: 0 => personal license, 1 => full license).
-     *  - Next 32 bytes determine the expiry date: MaxUint => no expiry date.
+     *  - Next 32 bytes determine the expiry date (expiry block number): MaxUint => no expiry date.
      *
      * TODO: consider adding the URI to this mapping.
      */
@@ -77,14 +77,14 @@ contract TaureumNFT is ERC721 {
     modifier transferable(
         uint256 _tokenId
     ) {
-        require(isTransferable(_tokenId), "TOKEN_NOT_TRANSFERABLE");
+        require(_isTransferable(_tokenId), "TOKEN_NOT_TRANSFERABLE");
         _;
     }
 
     /**
      * @dev Emitted when `tokenId` token is minted for `to`.
      */
-    event Mint(address indexed to, uint256 indexed tokenId, string uri, uint8 license, uint expiryDate);
+    event Mint(address indexed to, uint256 indexed tokenId, string uri, uint expiryDate);
 
     /**
      * @dev Create a new TaureumNFT contract and assign the KYCAddress to _KYCAddress.
@@ -112,8 +112,8 @@ contract TaureumNFT is ERC721 {
       *    - to cannot receive NFTs.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
-      * @param license The license of the minting NFT (0 or 1).
-      * @param expiryDate The expiry date of the minting NFT.
+      * @param license The license of the minting NFT (0 - personally-licensed or 1 - fully-licensed).
+      * @param expiryDate The block number at which the minting NFT is expired.
       */
     function mint(
         address to,
@@ -126,7 +126,7 @@ contract TaureumNFT is ERC721 {
     canReceiveNFT(to)
     {
         require(license < 2, "LICENSE_MUST_BE_O_OR_1");
-        require(expiryDate > block.timestamp, "EXPIRY_DATE_NOT_VALID");
+        require(expiryDate > block.number, "EXPIRY_DATE_NOT_VALID");
         _tokenIds.increment();
 
         uint256 id = _tokenIds.current();
@@ -135,8 +135,6 @@ contract TaureumNFT is ERC721 {
         uriExists[uri] = true;
         idToFirstOwner[id] = to;
         idToProperty[id] = abi.encodePacked(license, expiryDate);
-
-        emit Mint(to, id, uri, license, expiryDate);
     }
 
     /**
@@ -147,26 +145,6 @@ contract TaureumNFT is ERC721 {
 
         string memory baseURI = _baseURI();
         return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, idToUri[tokenId])) : idToUri[tokenId];
-    }
-
-    /**
-     * @dev Check if an NFT token is transferable.
-     * @param _tokenId The NFT tokenID to check.
-     */
-    function isTransferable(uint256 _tokenId) internal view returns (bool) {
-        address firstOwner = idToFirstOwner[_tokenId];
-        bytes memory tokenData = getTokenData(_tokenId);
-
-        uint8 licenseType = uint8(tokenData[0]);
-        if (licenseType != 1 && msg.sender != firstOwner) {
-            return false;
-        }
-
-        uint expiryDate;
-        assembly {
-            expiryDate := mload(add(tokenData, 0x20)) // tokenData[1:33]
-        }
-        return block.timestamp < expiryDate;
     }
 
     /**
@@ -211,6 +189,27 @@ contract TaureumNFT is ERC721 {
     ) public override transferable(tokenId) canReceiveNFT(to) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
         _safeTransfer(from, to, tokenId, _data);
+    }
+
+    /**
+     * @dev Check if an NFT token is transferable.
+     * @param _tokenId The NFT tokenID to check.
+     */
+    function _isTransferable(uint256 _tokenId) internal view returns (bool) {
+        address firstOwner = idToFirstOwner[_tokenId];
+        bytes memory tokenData = getTokenData(_tokenId);
+
+        uint8 licenseType = uint8(tokenData[0]);
+        if (licenseType != 1 && msg.sender != firstOwner) {
+            return false;
+        }
+
+        uint expiryDate;
+        assembly {
+            tokenData := add(tokenData, 1)
+            expiryDate := mload(add(tokenData, 0x20)) // tokenData[1:33]
+        }
+        return block.number < expiryDate;
     }
 
     /**
