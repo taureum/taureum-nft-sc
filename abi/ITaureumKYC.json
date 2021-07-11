@@ -21,7 +21,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"isVerifiedUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/D/00_TauDefi/github/taudefi-nft/contracts/ITaureumKYC.sol\":\"ITaureumKYC\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/D/00_TauDefi/github/taudefi-nft/contracts/ITaureumKYC.sol\":{\"keccak256\":\"0xb968f8826ea735d60ca62788199fb25bf6536fbbe10c48fc1376e295a455376a\",\"license\":\"UNLICENSE\",\"urls\":[\"bzz-raw://6825e1e98d726c889b2fe944ccba6d7d74109a7fd29b58a3ba019e5667636a03\",\"dweb:/ipfs/QmYNQ9QjnPc6wA5Ko3fBhjWz2yMcZfmdU56e98Nrpj4RCn\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.4+commit.c7e474f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"isVerifiedUser\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/ITaureumKYC.sol\":\"ITaureumKYC\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/ITaureumKYC.sol\":{\"keccak256\":\"0x5456ba50a39782fbca71096a21b168367ef75a2d3626262cf09598d45b1dee3d\",\"license\":\"UNLICENSE\",\"urls\":[\"bzz-raw://69b8c77a0ae12bc7168e09b3ed6191fddf01f87e931afb201757fe3886d1ffb9\",\"dweb:/ipfs/QmUkf2Kjohn5MA95FWNSmJNx1SsiNtjU3mxkGkvu7KA7zm\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -29,10 +29,10 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "//SPDX-License-Identifier: UNLICENSE\r\npragma solidity 0.8.4;\r\n\r\ninterface ITaureumKYC {\r\n    function isVerifiedUser(address addr) external view returns (bool);\r\n}",
-  "sourcePath": "D:\\00_TauDefi\\github\\taudefi-nft\\contracts\\ITaureumKYC.sol",
+  "source": "//SPDX-License-Identifier: UNLICENSE\npragma solidity 0.8.4;\n\ninterface ITaureumKYC {\n    function isVerifiedUser(address addr) external view returns (bool);\n}",
+  "sourcePath": "/home/toor/nodejs/truffle/nft_demo/taudefi/taudefi-nft/contracts/ITaureumKYC.sol",
   "ast": {
-    "absolutePath": "/D/00_TauDefi/github/taudefi-nft/contracts/ITaureumKYC.sol",
+    "absolutePath": "project:/contracts/ITaureumKYC.sol",
     "exportedSymbols": {
       "ITaureumKYC": [
         9
@@ -50,7 +50,7 @@
           ".4"
         ],
         "nodeType": "PragmaDirective",
-        "src": "38:22:0"
+        "src": "37:22:0"
       },
       {
         "abstract": false,
@@ -63,7 +63,7 @@
           9
         ],
         "name": "ITaureumKYC",
-        "nameLocation": "74:11:0",
+        "nameLocation": "71:11:0",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
@@ -73,7 +73,7 @@
             "kind": "function",
             "modifiers": [],
             "name": "isVerifiedUser",
-            "nameLocation": "102:14:0",
+            "nameLocation": "98:14:0",
             "nodeType": "FunctionDefinition",
             "parameters": {
               "id": 4,
@@ -84,10 +84,10 @@
                   "id": 3,
                   "mutability": "mutable",
                   "name": "addr",
-                  "nameLocation": "125:4:0",
+                  "nameLocation": "121:4:0",
                   "nodeType": "VariableDeclaration",
                   "scope": 8,
-                  "src": "117:12:0",
+                  "src": "113:12:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -98,7 +98,7 @@
                     "id": 2,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "117:7:0",
+                    "src": "113:7:0",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -108,7 +108,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "116:14:0"
+              "src": "112:14:0"
             },
             "returnParameters": {
               "id": 7,
@@ -122,7 +122,7 @@
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
                   "scope": 8,
-                  "src": "154:4:0",
+                  "src": "150:4:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -133,7 +133,7 @@
                     "id": 5,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "154:4:0",
+                    "src": "150:4:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -142,24 +142,24 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "153:6:0"
+              "src": "149:6:0"
             },
             "scope": 9,
-            "src": "93:67:0",
+            "src": "89:67:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
         "scope": 10,
-        "src": "64:99:0",
+        "src": "61:97:0",
         "usedErrors": []
       }
     ],
-    "src": "38:125:0"
+    "src": "37:121:0"
   },
   "legacyAST": {
-    "absolutePath": "/D/00_TauDefi/github/taudefi-nft/contracts/ITaureumKYC.sol",
+    "absolutePath": "project:/contracts/ITaureumKYC.sol",
     "exportedSymbols": {
       "ITaureumKYC": [
         9
@@ -177,7 +177,7 @@
           ".4"
         ],
         "nodeType": "PragmaDirective",
-        "src": "38:22:0"
+        "src": "37:22:0"
       },
       {
         "abstract": false,
@@ -190,7 +190,7 @@
           9
         ],
         "name": "ITaureumKYC",
-        "nameLocation": "74:11:0",
+        "nameLocation": "71:11:0",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
@@ -200,7 +200,7 @@
             "kind": "function",
             "modifiers": [],
             "name": "isVerifiedUser",
-            "nameLocation": "102:14:0",
+            "nameLocation": "98:14:0",
             "nodeType": "FunctionDefinition",
             "parameters": {
               "id": 4,
@@ -211,10 +211,10 @@
                   "id": 3,
                   "mutability": "mutable",
                   "name": "addr",
-                  "nameLocation": "125:4:0",
+                  "nameLocation": "121:4:0",
                   "nodeType": "VariableDeclaration",
                   "scope": 8,
-                  "src": "117:12:0",
+                  "src": "113:12:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -225,7 +225,7 @@
                     "id": 2,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "117:7:0",
+                    "src": "113:7:0",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -235,7 +235,7 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "116:14:0"
+              "src": "112:14:0"
             },
             "returnParameters": {
               "id": 7,
@@ -249,7 +249,7 @@
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
                   "scope": 8,
-                  "src": "154:4:0",
+                  "src": "150:4:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -260,7 +260,7 @@
                     "id": 5,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "154:4:0",
+                    "src": "150:4:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -269,21 +269,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "153:6:0"
+              "src": "149:6:0"
             },
             "scope": 9,
-            "src": "93:67:0",
+            "src": "89:67:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
         "scope": 10,
-        "src": "64:99:0",
+        "src": "61:97:0",
         "usedErrors": []
       }
     ],
-    "src": "38:125:0"
+    "src": "37:121:0"
   },
   "compiler": {
     "name": "solc",
@@ -291,7 +291,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-11T01:47:46.489Z",
+  "updatedAt": "2021-07-11T02:17:28.025Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
