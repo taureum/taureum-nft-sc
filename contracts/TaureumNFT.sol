@@ -6,8 +6,9 @@ import "./lib/token/ERC721/ERC721.sol";
 import "./lib/access/AccessControl.sol";
 import "./ITaureumKYC.sol";
 import "./lib/utils/Counters.sol";
+import "./lib/access/Ownable.sol";
 
-contract TaureumNFT is ERC721 {
+contract TaureumNFT is ERC721, Ownable {
     using Counters for Counters.Counter;
     /**
      * @dev A counter to track tokenId.
@@ -91,7 +92,7 @@ contract TaureumNFT is ERC721 {
      *
      * TODO: change the default name and symbol.
      */
-    constructor(address KYCAddress) ERC721("Taureum NFT", "Taureum") {
+    constructor(address KYCAddress) ERC721("Taureum NFT", "Taureum") Ownable() {
         _KYCAddress = KYCAddress;
     }
 
@@ -124,6 +125,7 @@ contract TaureumNFT is ERC721 {
     public
     notExists(uri)
     canReceiveNFT(to)
+    returns (uint256)
     {
         require(license < 2, "LICENSE_MUST_BE_O_OR_1");
         require(expiryDate > block.number, "EXPIRY_DATE_NOT_VALID");
@@ -135,6 +137,8 @@ contract TaureumNFT is ERC721 {
         uriExists[uri] = true;
         idToFirstOwner[id] = to;
         idToProperty[id] = abi.encodePacked(license, expiryDate);
+
+        return id;
     }
 
     /**
@@ -189,6 +193,22 @@ contract TaureumNFT is ERC721 {
     ) public override transferable(tokenId) canReceiveNFT(to) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
         _safeTransfer(from, to, tokenId, _data);
+    }
+
+    /**
+     * @dev Reset the `_KYCAddress` to kycAddr.
+     * @notice Only the owner of this contract is able to change the the KYC contract address.
+     */
+    function setKYCImplementation(address kycAddr) onlyOwner external {
+        _KYCAddress = kycAddr;
+    }
+
+    /**
+     * @dev Reset the `_KYCAddress` to kycAddr.
+     * @notice Only the owner of this contract is able to change the the KYC contract address.
+     */
+    function getKYCAddress() public view returns(address) {
+        return _KYCAddress;
     }
 
     /**

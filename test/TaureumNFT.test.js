@@ -4,6 +4,8 @@ const Web3 = require('web3');
 const TaureumNFT = artifacts.require("./TaureumNFT.sol")
 const {addVerifiedUser} = require("./helper/kyc_helper")
 
+const { BigNumber } = require("ethers");
+
 const {
     ERC721_MINT_TO_ZERO_ADDRESS_ERROR,
     ERC721_BALANCE_QUERY_FOR_ZERO_ADDRESS,
@@ -12,6 +14,7 @@ const {
     NFT_COUNT_MAX_EXCEEDED,
     URI_EXISTS,
     EXPIRY_DATE_NOT_VALID,
+    NOT_CONTRACT_OWNER,
     shouldErrorContainMessage,
 } = require("./helper/errors")
 
@@ -29,6 +32,8 @@ contract('TaureumNFT', (accounts) => {
     let contract
     let web3
 
+    let contractOwner = accounts[0]
+    let notContractOwner = accounts[1]
     let verifiedUser = accounts[0]
     let anotherVerifiedUser = accounts[1]
     let notVerifiedUser = accounts[2]
@@ -50,7 +55,7 @@ contract('TaureumNFT', (accounts) => {
     })
 
     describe('deployment', async() => {
-        it('deploys successfully', async()=> {
+        it('deploy successfully', async()=> {
             const addr = await contract.address
 
             assert.notEqual(addr, "")
@@ -58,13 +63,13 @@ contract('TaureumNFT', (accounts) => {
             assert.notEqual(addr, undefined)
         })
 
-        it('has a name', async()=> {
+        it('have a name', async()=> {
             const name = await contract.name()
 
             assert.equal(name, "Taureum NFT", "contract name invalid")
         })
 
-        it('has a symbol', async()=> {
+        it('have a symbol', async()=> {
             const symbol = await contract.symbol()
 
             assert.equal(symbol, "Taureum", "contract symbol invalid")
@@ -85,7 +90,7 @@ contract('TaureumNFT', (accounts) => {
             assert.equal(event.to, verifiedUser, "to is incorrect")
 
             //Check tokenURI
-            tokenId = event.tokenId
+            let tokenId = event.tokenId
             const tokenURI = await contract.tokenURI(tokenId)
             assert.equal(tokenURI, `ipfs://${uri}`, "tokenURI is invalid")
 
@@ -196,7 +201,7 @@ contract('TaureumNFT', (accounts) => {
             assert.equal(tmpOwner, newOwner, "owner is invalid")
         })
 
-        it("newOwner should be able to transfer a full-licensed token", async() => {
+        it("newOwner should be able to transfer a fully-licensed token", async() => {
             //mint a token to test
             const result = await mintRandomToken(contract, verifiedUser, 1)
             const event = result.logs[0].args
@@ -391,5 +396,37 @@ contract('TaureumNFT', (accounts) => {
                 assert.equal(shouldErrorContainMessage(error, TOKEN_NOT_TRANSFERABLE), true)
             }
         })
+    })
+
+    describe('KYC contract address', async () => {
+        it("contract owner should be able to set new KYC contract address", async() => {
+            //mint a token to test
+            const currentKYCAddress = await contract.getKYCAddress()
+            console.log(`\t currentKYCAddress: ${currentKYCAddress}`)
+
+            //Contract owner should be able to set new KYC contract address
+            let newKYCAddress = '0x20227ba0f3451438ff0311e9b67fcfa8e3ccd57a'
+            await contract.setKYCImplementation(newKYCAddress)
+
+            const tmpNewKYCAddress = await contract.getKYCAddress()
+            console.log(`\t newKYCAddress: ${tmpNewKYCAddress}`)
+            assert.equal(BigNumber.from(tmpNewKYCAddress).toString(),
+                BigNumber.from(newKYCAddress).toString()    ,
+                "KYC address is invalid")
+
+            await contract.setKYCImplementation(currentKYCAddress)
+        })
+
+        it("not contract owner should not be able to set new KYC contract address", async() => {
+            //mint a token to test
+            const currentKYCAddress = await contract.getKYCAddress()
+            console.log(`\t currentKYCAddress: ${currentKYCAddress}`)
+
+            //Contract owner should be able to set new KYC contract address
+            let newKYCAddress = '0x20227ba0f3451438ff0311e9b67fcfa8e3ccd57a'
+            await contract.setKYCImplementation(newKYCAddress, {from: notContractOwner}).should.be.rejected;
+        })
+
+
     })
 })
