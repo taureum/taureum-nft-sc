@@ -14,4 +14,10 @@ async function mintRandomToken(contract, owner, license) {
     return await contract.mint(owner, uri, license, expiryDate, {from: owner})
 }
 
-module.exports = {mintToken, mintRandomToken}
+async function wait(timeOut) {
+    return new Promise(resolve => {
+        setTimeout(resolve, timeOut);
+    });
+}
+
+module.exports = {mintToken, mintRandomToken, wait}

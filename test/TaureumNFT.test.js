@@ -1,5 +1,6 @@
 var crypto = require("crypto");
-const { assert } = require('chai')
+const {assert} = require('chai')
+const Web3 = require('web3');
 const TaureumNFT = artifacts.require("./TaureumNFT.sol")
 const {addVerifiedUser} = require("./helper/kyc_helper")
 
@@ -11,12 +12,13 @@ const {
     NFT_COUNT_MAX_EXCEEDED,
     URI_EXISTS,
     EXPIRY_DATE_NOT_VALID,
-    shouldErrorContainMessage
+    shouldErrorContainMessage,
 } = require("./helper/errors")
 
 const {
     mintToken,
-    mintRandomToken
+    mintRandomToken,
+    wait
 } = require("./helper/helper")
 
 require('chai')
@@ -25,6 +27,8 @@ require('chai')
 
 contract('TaureumNFT', (accounts) => {
     let contract
+    let web3
+
     let verifiedUser = accounts[0]
     let anotherVerifiedUser = accounts[1]
     let notVerifiedUser = accounts[2]
@@ -34,7 +38,9 @@ contract('TaureumNFT', (accounts) => {
     let notApprovedUser = accounts[6]
     let zeroAddress = '0x0000000000000000000000000000000000000000'
 
-    before (async() => {
+    before(async () => {
+        web3 = new Web3("http://127.0.0.1:7545")
+
         await addVerifiedUser(anotherVerifiedUser)
         await addVerifiedUser(newOwner)
         await addVerifiedUser(approvedUser)
@@ -55,13 +61,13 @@ contract('TaureumNFT', (accounts) => {
         it('has a name', async()=> {
             const name = await contract.name()
 
-            assert.equal(name, "TaureumNFT", "contract name invalid")
+            assert.equal(name, "Taureum NFT", "contract name invalid")
         })
 
         it('has a symbol', async()=> {
             const symbol = await contract.symbol()
 
-            assert.equal(symbol, "TauNFT", "contract symbol invalid")
+            assert.equal(symbol, "Taureum", "contract symbol invalid")
         })
     })
 
@@ -77,7 +83,7 @@ contract('TaureumNFT', (accounts) => {
             assert.equal(event.tokenId, 1, "id is incorrect")
             assert.equal(event.from, "0x0000000000000000000000000000000000000000", '_from is incorrect')
             assert.equal(event.to, verifiedUser, "to is incorrect")
-            
+
             //Check tokenURI
             tokenId = event.tokenId
             const tokenURI = await contract.tokenURI(tokenId)
@@ -161,7 +167,11 @@ contract('TaureumNFT', (accounts) => {
 
         it("mint with expiryDate prior to current timeStamp should be rejected", async() => {
             let uri = crypto.randomBytes(32).toString('hex');
-            let expiryDate = Math.floor(Date.now() / 1000);
+            let blockTime = 5
+            // set the token expire data to be 10 blocks from now
+            let currentBlock = await web3.eth.getBlockNumber()
+            let expiryDate = currentBlock - 1
+            console.log(`\t currentBlock: ${currentBlock}, expiryBlock: ${expiryDate}`)
             try {
                 await mintToken(contract, verifiedUser, uri, crypto.randomInt(0, 2), expiryDate);
                 assert.equal(true, false, 'should not pass')
@@ -171,7 +181,7 @@ contract('TaureumNFT', (accounts) => {
         })
     })
 
-    describe('transferring and approval', async() => {
+    describe('transferring and approval', async () => {
         it("owner should be able to transfer its token", async() => {
             //mint a token to test
             const result = await mintRandomToken(contract, verifiedUser, 1)
@@ -350,6 +360,35 @@ contract('TaureumNFT', (accounts) => {
             } catch (error) {
                 // Should throw a NOT_OWNER_OR_APPROVED message
                 assert.equal(shouldErrorContainMessage(error, NOT_OWNER_OR_APPROVED), true)
+            }
+        })
+
+        it("transferring an expired token should be rejected", async () => {
+            let uri = crypto.randomBytes(32).toString('hex');
+            let blockTime = 5
+            // set the token expire data to be 10 blocks from now
+            let currentBlock = await web3.eth.getBlockNumber()
+            let expiryDate = currentBlock + 2
+            console.log(`\t currentBlock: ${currentBlock}, expiryBlock: ${expiryDate}`)
+            try {
+                // mint should be successful
+                const result = await mintToken(contract, verifiedUser, uri, 1, expiryDate);
+                let event = result.logs[0].args
+                let tokenId = event.tokenId
+
+                // transfer this token to another user should also work
+                await contract.transferFrom(verifiedUser, newOwner, tokenId, {from: verifiedUser})
+
+                // sleep 10 blocks
+                await wait(2 * blockTime * 1000)
+
+                // transfer this token to another user should also work
+                currentBlock = await web3.eth.getBlockNumber()
+                console.log(`\t attempt to transfer at block ${currentBlock}`)
+                await contract.transferFrom(newOwner, anotherVerifiedUser, tokenId, {from: newOwner})
+                assert.equal(true, false, "should not pass")
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, TOKEN_NOT_TRANSFERABLE), true)
             }
         })
     })
