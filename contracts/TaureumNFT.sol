@@ -18,7 +18,7 @@ contract TaureumNFT is ERC721, Ownable {
     /**
      * @dev The contract address for the KYC entry.
      */
-    address _KYCAddress;
+    address internal _KYCAddress;
 
     /**
      * @dev Mapping from NFT ID to metadata uri.
@@ -108,8 +108,8 @@ contract TaureumNFT is ERC721, Ownable {
 
     /**
       * @dev Mint a new NFT.
-      * It throws an exception if
-      *    - uri does not exist.
+      * @notice It throws an exception if
+      *    - uri exists.
       *    - to cannot receive NFTs.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
@@ -127,18 +127,7 @@ contract TaureumNFT is ERC721, Ownable {
     canReceiveNFT(to)
     returns (uint256)
     {
-        require(license < 2, "LICENSE_MUST_BE_O_OR_1");
-        require(expiryDate > block.number, "EXPIRY_DATE_NOT_VALID");
-        _tokenIds.increment();
-
-        uint256 id = _tokenIds.current();
-        super._mint(to, id);
-        _setTokenUri(id, uri);
-        uriExists[uri] = true;
-        idToFirstOwner[id] = to;
-        idToProperty[id] = abi.encodePacked(license, expiryDate);
-
-        return id;
+        return _mint(to, uri, license, expiryDate);
     }
 
     /**
@@ -209,6 +198,39 @@ contract TaureumNFT is ERC721, Ownable {
      */
     function getKYCAddress() public view returns(address) {
         return _KYCAddress;
+    }
+
+    /**
+      * @dev Mint a new NFT.
+      * @notice It throws an exception if
+      *    - `license` is not valid.
+      *    - `expiryDate` is less than the current block number.
+      * @param to The address that will own the minted NFT.
+      * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
+      * @param license The license of the minting NFT (0 - personally-licensed or 1 - fully-licensed).
+      * @param expiryDate The block number at which the minting NFT is expired.
+      */
+    function _mint(
+        address to,
+        string calldata uri,
+        uint8 license,
+        uint expiryDate
+    )
+    internal
+    returns (uint256)
+    {
+        require(license < 2, "LICENSE_MUST_BE_O_OR_1");
+        require(expiryDate > block.number, "EXPIRY_DATE_NOT_VALID");
+        _tokenIds.increment();
+
+        uint256 id = _tokenIds.current();
+        super._mint(to, id);
+        _setTokenUri(id, uri);
+        uriExists[uri] = true;
+        idToFirstOwner[id] = to;
+        idToProperty[id] = abi.encodePacked(license, expiryDate);
+
+        return id;
     }
 
     /**

@@ -125,7 +125,7 @@ contract('TaureumNFT', (accounts) => {
         it("should be valid for verified accounts", async() => {
             const count = await contract.balanceOf(verifiedUser)
             // console.log(`countNFT of ${verifiedUser}: ${count}`)
-            for (let i = 1; i <= 20 - count; i++) {
+            for (let i = 1; i <= 10 - count; i++) {
                 const result = await mintRandomToken(contract, verifiedUser, 1)
                 // console.log(result)
 
