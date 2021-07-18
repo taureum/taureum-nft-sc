@@ -1,7 +1,7 @@
 var crypto = require("crypto");
 const {assert} = require('chai')
 const Web3 = require('web3');
-const TaureumNFT = artifacts.require("./TaureumNFT.sol")
+const TaureumNFT = artifacts.require("./TaureumERC721.sol")
 const {addVerifiedUser} = require("./helper/kyc_helper")
 
 const { BigNumber } = require("ethers");
@@ -80,12 +80,18 @@ contract('TaureumNFT', (accounts) => {
         it("create a simple NFT", async() => {
             let uri = "aaaaababababababababababababababababa"
             let license = 1
-            let expiryDate = "10000000000000000000"
-            const result = await mintToken(contract, verifiedUser, uri, license, expiryDate)
+            let expiryBlock = 10000000
+            const result = await mintToken(contract, verifiedUser, uri, license, expiryBlock)
+            let packed = await web3.eth.abi.encodeParameters(['address', 'string', 'uint8', 'uint256'],
+                [verifiedUser, uri, license, expiryBlock])
+            console.log(`pack`, packed)
+
+            let expectedTokenID = web3.utils.soliditySha3(packed).toString('hex')
+            console.log(`expectTokenID`, expectedTokenID)
 
             //SUCCESS
             const event = result.logs[0].args
-            assert.equal(event.tokenId, 1, "id is incorrect")
+            assert.equal(event.tokenId.toString('hex'), expectedTokenID.substring(2, 66), "id is incorrect")
             assert.equal(event.from, "0x0000000000000000000000000000000000000000", '_from is incorrect')
             assert.equal(event.to, verifiedUser, "to is incorrect")
 
@@ -97,29 +103,6 @@ contract('TaureumNFT', (accounts) => {
             //Check owner
             const owner = await contract.ownerOf(tokenId)
             assert.equal(owner, verifiedUser, "own is invalid")
-        })
-
-        it("cannot mint duplicate URI", async() => {
-            let uri = crypto.randomBytes(32).toString('hex');
-            let license = crypto.randomInt(0, 2)
-            let expiryDate = "10000000000000000000"
-            await mintToken(contract, verifiedUser, uri, license, expiryDate)
-
-            //FAIL: cannot mint same URI twice
-            try {
-                await mintToken(contract, verifiedUser, uri, license, expiryDate);
-                assert.equal(true, false, 'should not pass')
-            } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, URI_EXISTS), true)
-            }
-
-            //FAIL: cannot mint same URI twice, even for another account
-            try {
-                await mintToken(contract, anotherVerifiedUser, uri, license, expiryDate);
-                assert.equal(true, false, 'should not pass')
-            } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, URI_EXISTS), true)
-            }
         })
 
         it("should be valid for verified accounts", async() => {
