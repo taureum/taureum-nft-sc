@@ -8,7 +8,7 @@ import "./ITaureumKYC.sol";
 import "./lib/utils/Counters.sol";
 import "./lib/access/Ownable.sol";
 
-contract TaureumNFT is ERC721, Ownable {
+contract TaureumERC721 is ERC721, Ownable {
     using Counters for Counters.Counter;
     /**
      * @dev A counter to track tokenId.
@@ -120,14 +120,14 @@ contract TaureumNFT is ERC721, Ownable {
         address to,
         string calldata uri,
         uint8 license,
-        uint expiryDate
+        uint expiryBlock
     )
     public
     notExists(uri)
     canReceiveNFT(to)
     returns (uint256)
     {
-        return _mint(to, uri, license, expiryDate);
+        return _mint(to, uri, license, expiryBlock);
     }
 
     /**
@@ -214,13 +214,13 @@ contract TaureumNFT is ERC721, Ownable {
         address to,
         string calldata uri,
         uint8 license,
-        uint expiryDate
+        uint expiryBlock
     )
     internal
     returns (uint256)
     {
         require(license < 2, "LICENSE_MUST_BE_O_OR_1");
-        require(expiryDate > block.number, "EXPIRY_DATE_NOT_VALID");
+        require(expiryBlock > block.number, "EXPIRY_DATE_NOT_VALID");
         _tokenIds.increment();
 
         uint256 id = _tokenIds.current();
@@ -228,7 +228,7 @@ contract TaureumNFT is ERC721, Ownable {
         _setTokenUri(id, uri);
         uriExists[uri] = true;
         idToFirstOwner[id] = to;
-        idToProperty[id] = abi.encodePacked(license, expiryDate);
+        idToProperty[id] = abi.encodePacked(license, expiryBlock);
 
         return id;
     }
