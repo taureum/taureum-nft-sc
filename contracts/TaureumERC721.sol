@@ -9,12 +9,6 @@ import "./lib/utils/Counters.sol";
 import "./lib/access/Ownable.sol";
 
 contract TaureumERC721 is ERC721, Ownable {
-    using Counters for Counters.Counter;
-    /**
-     * @dev A counter to track tokenId.
-     */
-    Counters.Counter private _tokenIds;
-
     /**
      * @dev The contract address for the KYC entry.
      */
@@ -29,11 +23,6 @@ contract TaureumERC721 is ERC721, Ownable {
      * @dev Mapping from NFT ID to its first owner.
      */
     mapping(uint256 => address) internal idToFirstOwner;
-
-    /**
-     * @dev Mapping from NFT URI to its existence.
-     */
-    mapping(string => bool) internal uriExists;
 
     /**
      * @dev Mapping from NFT ID to the NFT property (encode the tokenData struct).
@@ -60,18 +49,6 @@ contract TaureumERC721 is ERC721, Ownable {
     }
 
     /**
-     * @dev Guarantee the _uri does not exist.
-     * @param _uri The IPFS URI of the NFT.
-     */
-    modifier notExists(
-        string memory _uri
-    )
-    {
-        require(!uriExists[_uri], "URI_EXISTS");
-        _;
-    }
-
-    /**
      * @dev Guarantee the _tokenId is not expired and transferable.
      * @param _tokenId The NFT token ID to validate.
      */
@@ -88,11 +65,11 @@ contract TaureumERC721 is ERC721, Ownable {
     event Mint(address indexed to, uint256 indexed tokenId, string uri, uint expiryDate);
 
     /**
-     * @dev Create a new TaureumNFT contract and assign the KYCAddress to _KYCAddress.
+     * @dev Create a new TaureumERC721 contract and assign the KYCAddress to _KYCAddress.
      *
      * TODO: change the default name and symbol.
      */
-    constructor(address KYCAddress) ERC721("Taureum NFT", "Taureum") Ownable() {
+    constructor(address KYCAddress) ERC721("Taureum ERC721", "Taureum") Ownable() {
         _KYCAddress = KYCAddress;
     }
 
@@ -109,12 +86,11 @@ contract TaureumERC721 is ERC721, Ownable {
     /**
       * @dev Mint a new NFT.
       * @notice It throws an exception if
-      *    - uri exists.
-      *    - to cannot receive NFTs.
+      *    - `to` cannot receive NFTs.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
       * @param license The license of the minting NFT (0 - personally-licensed or 1 - fully-licensed).
-      * @param expiryDate The block number at which the minting NFT is expired.
+      * @param expiryBlock The block number at which the minting NFT is expired.
       */
     function mint(
         address to,
@@ -123,7 +99,6 @@ contract TaureumERC721 is ERC721, Ownable {
         uint expiryBlock
     )
     public
-    notExists(uri)
     canReceiveNFT(to)
     returns (uint256)
     {
@@ -204,29 +179,27 @@ contract TaureumERC721 is ERC721, Ownable {
       * @dev Mint a new NFT.
       * @notice It throws an exception if
       *    - `license` is not valid.
-      *    - `expiryDate` is less than the current block number.
+      *    - `expiryBlock` is less than the current block number.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
       * @param license The license of the minting NFT (0 - personally-licensed or 1 - fully-licensed).
-      * @param expiryDate The block number at which the minting NFT is expired.
+      * @param expiryBlock The block number at which the minting NFT is expired.
       */
     function _mint(
         address to,
         string calldata uri,
         uint8 license,
-        uint expiryBlock
+        uint256 expiryBlock
     )
     internal
     returns (uint256)
     {
         require(license < 2, "LICENSE_MUST_BE_O_OR_1");
         require(expiryBlock > block.number, "EXPIRY_DATE_NOT_VALID");
-        _tokenIds.increment();
 
-        uint256 id = _tokenIds.current();
+        uint256 id = uint256(keccak256(abi.encode(to, uri, license, expiryBlock)));
         super._mint(to, id);
         _setTokenUri(id, uri);
-        uriExists[uri] = true;
         idToFirstOwner[id] = to;
         idToProperty[id] = abi.encodePacked(license, expiryBlock);
 
