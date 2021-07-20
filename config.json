@@ -1,8 +1,8 @@
 {
   "deployed": {
     "development": {
-      "TaureumKYCMock": "0x1E8180819A5149f514Dd7226546F42A623761FF8",
-      "TaureumERC721": "0x01cD57179dFB0FE2e51356626301C062E70ED37F"
+      "TaureumKYCMock": "0x0Cc388a2D87f61D833aa10BCb2BF88bB7b8322f4",
+      "TaureumERC721": "0x668B30EB8e23582565435c3C4d2A879a69b944A1"
     },
     "testnet": {
       "TaureumERC721": "0xC4F7f1D1fa837Ba541be490CD4A13467Cc494E01"

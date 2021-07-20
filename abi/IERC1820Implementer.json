@@ -40,15 +40,15 @@
     "absolutePath": "project:/contracts/lib/utils/introspection/IERC1820Implementer.sol",
     "exportedSymbols": {
       "IERC1820Implementer": [
-        12533
+        12520
       ]
     },
-    "id": 12534,
+    "id": 12521,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 12521,
+        "id": 12508,
         "literals": [
           "solidity",
           "^",
@@ -56,7 +56,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:86"
+        "src": "33:23:85"
       },
       {
         "abstract": false,
@@ -64,48 +64,48 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 12522,
+          "id": 12509,
           "nodeType": "StructuredDocumentation",
-          "src": "58:264:86",
+          "src": "58:264:85",
           "text": " @dev Interface for an ERC1820 implementer, as defined in the\n https://eips.ethereum.org/EIPS/eip-1820#interface-implementation-erc1820implementerinterface[EIP].\n Used by contracts that will be registered as implementers in the\n {IERC1820Registry}."
         },
         "fullyImplemented": false,
-        "id": 12533,
+        "id": 12520,
         "linearizedBaseContracts": [
-          12533
+          12520
         ],
         "name": "IERC1820Implementer",
-        "nameLocation": "333:19:86",
+        "nameLocation": "333:19:85",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 12523,
+              "id": 12510,
               "nodeType": "StructuredDocumentation",
-              "src": "359:200:86",
+              "src": "359:200:85",
               "text": " @dev Returns a special value (`ERC1820_ACCEPT_MAGIC`) if this contract\n implements `interfaceHash` for `account`.\n See {IERC1820Registry-setInterfaceImplementer}."
             },
             "functionSelector": "249cb3fa",
-            "id": 12532,
+            "id": 12519,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "canImplementInterfaceForAddress",
-            "nameLocation": "573:31:86",
+            "nameLocation": "573:31:85",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 12528,
+              "id": 12515,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 12525,
+                  "id": 12512,
                   "mutability": "mutable",
                   "name": "interfaceHash",
-                  "nameLocation": "613:13:86",
+                  "nameLocation": "613:13:85",
                   "nodeType": "VariableDeclaration",
-                  "scope": 12532,
-                  "src": "605:21:86",
+                  "scope": 12519,
+                  "src": "605:21:85",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -113,10 +113,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 12524,
+                    "id": 12511,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "605:7:86",
+                    "src": "605:7:85",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -126,13 +126,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 12527,
+                  "id": 12514,
                   "mutability": "mutable",
                   "name": "account",
-                  "nameLocation": "636:7:86",
+                  "nameLocation": "636:7:85",
                   "nodeType": "VariableDeclaration",
-                  "scope": 12532,
-                  "src": "628:15:86",
+                  "scope": 12519,
+                  "src": "628:15:85",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -140,10 +140,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 12526,
+                    "id": 12513,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "628:7:86",
+                    "src": "628:7:85",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -153,21 +153,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "604:40:86"
+              "src": "604:40:85"
             },
             "returnParameters": {
-              "id": 12531,
+              "id": 12518,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 12530,
+                  "id": 12517,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 12532,
-                  "src": "668:7:86",
+                  "scope": 12519,
+                  "src": "668:7:85",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -175,10 +175,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 12529,
+                    "id": 12516,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "668:7:86",
+                    "src": "668:7:85",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -187,35 +187,35 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "667:9:86"
+              "src": "667:9:85"
             },
-            "scope": 12533,
-            "src": "564:113:86",
+            "scope": 12520,
+            "src": "564:113:85",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 12534,
-        "src": "323:356:86",
+        "scope": 12521,
+        "src": "323:356:85",
         "usedErrors": []
       }
     ],
-    "src": "33:647:86"
+    "src": "33:647:85"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/lib/utils/introspection/IERC1820Implementer.sol",
     "exportedSymbols": {
       "IERC1820Implementer": [
-        12533
+        12520
       ]
     },
-    "id": 12534,
+    "id": 12521,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 12521,
+        "id": 12508,
         "literals": [
           "solidity",
           "^",
@@ -223,7 +223,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:86"
+        "src": "33:23:85"
       },
       {
         "abstract": false,
@@ -231,48 +231,48 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 12522,
+          "id": 12509,
           "nodeType": "StructuredDocumentation",
-          "src": "58:264:86",
+          "src": "58:264:85",
           "text": " @dev Interface for an ERC1820 implementer, as defined in the\n https://eips.ethereum.org/EIPS/eip-1820#interface-implementation-erc1820implementerinterface[EIP].\n Used by contracts that will be registered as implementers in the\n {IERC1820Registry}."
         },
         "fullyImplemented": false,
-        "id": 12533,
+        "id": 12520,
         "linearizedBaseContracts": [
-          12533
+          12520
         ],
         "name": "IERC1820Implementer",
-        "nameLocation": "333:19:86",
+        "nameLocation": "333:19:85",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 12523,
+              "id": 12510,
               "nodeType": "StructuredDocumentation",
-              "src": "359:200:86",
+              "src": "359:200:85",
               "text": " @dev Returns a special value (`ERC1820_ACCEPT_MAGIC`) if this contract\n implements `interfaceHash` for `account`.\n See {IERC1820Registry-setInterfaceImplementer}."
             },
             "functionSelector": "249cb3fa",
-            "id": 12532,
+            "id": 12519,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "canImplementInterfaceForAddress",
-            "nameLocation": "573:31:86",
+            "nameLocation": "573:31:85",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 12528,
+              "id": 12515,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 12525,
+                  "id": 12512,
                   "mutability": "mutable",
                   "name": "interfaceHash",
-                  "nameLocation": "613:13:86",
+                  "nameLocation": "613:13:85",
                   "nodeType": "VariableDeclaration",
-                  "scope": 12532,
-                  "src": "605:21:86",
+                  "scope": 12519,
+                  "src": "605:21:85",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -280,10 +280,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 12524,
+                    "id": 12511,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "605:7:86",
+                    "src": "605:7:85",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -293,13 +293,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 12527,
+                  "id": 12514,
                   "mutability": "mutable",
                   "name": "account",
-                  "nameLocation": "636:7:86",
+                  "nameLocation": "636:7:85",
                   "nodeType": "VariableDeclaration",
-                  "scope": 12532,
-                  "src": "628:15:86",
+                  "scope": 12519,
+                  "src": "628:15:85",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -307,10 +307,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 12526,
+                    "id": 12513,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "628:7:86",
+                    "src": "628:7:85",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -320,21 +320,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "604:40:86"
+              "src": "604:40:85"
             },
             "returnParameters": {
-              "id": 12531,
+              "id": 12518,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 12530,
+                  "id": 12517,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 12532,
-                  "src": "668:7:86",
+                  "scope": 12519,
+                  "src": "668:7:85",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -342,10 +342,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 12529,
+                    "id": 12516,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "668:7:86",
+                    "src": "668:7:85",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -354,21 +354,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "667:9:86"
+              "src": "667:9:85"
             },
-            "scope": 12533,
-            "src": "564:113:86",
+            "scope": 12520,
+            "src": "564:113:85",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 12534,
-        "src": "323:356:86",
+        "scope": 12521,
+        "src": "323:356:85",
         "usedErrors": []
       }
     ],
-    "src": "33:647:86"
+    "src": "33:647:85"
   },
   "compiler": {
     "name": "solc",
@@ -376,7 +376,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-11T02:17:28.874Z",
+  "updatedAt": "2021-07-20T03:54:47.663Z",
   "devdoc": {
     "details": "Interface for an ERC1820 implementer, as defined in the https://eips.ethereum.org/EIPS/eip-1820#interface-implementation-erc1820implementerinterface[EIP]. Used by contracts that will be registered as implementers in the {IERC1820Registry}.",
     "kind": "dev",
