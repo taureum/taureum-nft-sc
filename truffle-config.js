@@ -5,6 +5,7 @@ const privateKey = fs.readFileSync(".secret").toString().trim();
 const bscProvider = new HDWalletProvider(privateKey, `https://data-seed-prebsc-1-s1.binance.org:8545`, 0, 1)
 
 module.exports = {
+    plugins: ["truffle-contract-size"],
     networks: {
         development: {
             host: "127.0.0.1",
@@ -14,7 +15,7 @@ module.exports = {
         testnet: {
             provider: bscProvider,
             network_id: 97,
-            confirmations: 3,
+            confirmations: 1,
             timeoutBlocks: 10000,
             gasLimit: 100000000
         },
