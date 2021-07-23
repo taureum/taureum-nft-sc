@@ -14,8 +14,8 @@ web3.eth.accounts.wallet.add({
     address: walletAddress
 });
 
-const TaureumERC721ABI = require('../../abi/TaureumERC721.json').abi
-const TaureumERC721Address = require('../../config.json').deployed.testnet.TaureumERC721
+const TaureumERC721ABI = require('../../abi/TaureumERC721Enumerable.json').abi
+const TaureumERC721Address = require('../../config.json').deployed.testnet.TaureumERC721Enumerable
 
 var TaureumERC721 = new web3.eth.Contract(TaureumERC721ABI, TaureumERC721Address);
 
@@ -23,19 +23,17 @@ var TaureumERC721 = new web3.eth.Contract(TaureumERC721ABI, TaureumERC721Address
 (async () => {
     try {
         let uri = crypto.randomBytes(20).toString('hex')
-        let license = 1
-        let expiryBlock = 100000000
 
-        let packed = web3.eth.abi.encodeParameters(['address', 'string', 'uint8', 'uint256'],
-            [walletAddress, uri, license, expiryBlock])
+        let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+            [walletAddress, uri])
         let expectedTokenId = web3.utils.soliditySha3(packed).toString('hex')
         console.log(`expectedTokenId`, expectedTokenId)
 
-        const gasEstimate = await TaureumERC721.methods.mint(walletAddress, uri, license, expiryBlock).estimateGas(
+        const gasEstimate = await TaureumERC721.methods.mint(walletAddress, uri).estimateGas(
             { from: walletAddress });
         console.log(`estimatedGas for minting: ${gasEstimate}`)
 
-        let res = await TaureumERC721.methods.mint(walletAddress, uri, license, expiryBlock)
+        let res = await TaureumERC721.methods.mint(walletAddress, uri)
             .send({
                 from: walletAddress,
                 gas: gasEstimate

@@ -7,7 +7,6 @@ var crypto = require("crypto");
 const walletAddress = require('./config.json').walletAddress
 
 const fs = require('fs');
-const {BigNumber} = require("ethers");
 const {mintRandomNFT} = require('./utils')
 const privateKey = fs.readFileSync("../../.secret").toString().trim(); // read the secret key of the account.
 web3.eth.accounts.wallet.add({
@@ -15,11 +14,10 @@ web3.eth.accounts.wallet.add({
     address: walletAddress
 });
 
-const TaureumERC721ABI = require('../../abi/TaureumERC721.json').abi
-const TaureumERC721Address = require('../../config.json').deployed.testnet.TaureumERC721
+const TaureumERC721ABI = require('../../abi/TaureumERC721Enumerable.json').abi
+const TaureumERC721Address = require('../../config.json').deployed.testnet.TaureumERC721Enumerable
 
 var TaureumERC721 = new web3.eth.Contract(TaureumERC721ABI, TaureumERC721Address);
-
 
 (async () => {
     try {
