@@ -5,7 +5,8 @@
       "TaureumERC721": "0x668B30EB8e23582565435c3C4d2A879a69b944A1"
     },
     "testnet": {
-      "TaureumERC721": "0xC4F7f1D1fa837Ba541be490CD4A13467Cc494E01"
+      "TaureumERC721": "0x0D5Fcb002FF2AebD456E62F7635Ae5A2318260dD",
+      "TaureumERC721Enumerable": "0x4441C8f380379e234268D59853dcBdA8ea2f72b2"
     }
   }
 }
