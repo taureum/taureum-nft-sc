@@ -1,7 +1,7 @@
 var crypto = require("crypto");
 const {assert} = require('chai')
 const Web3 = require('web3');
-const TaureumNFT = artifacts.require("./TaureumERC721.sol")
+const TaureumNFT = artifacts.require("./TaureumERC721Enumerable.sol")
 const {addVerifiedUser} = require("./helper/kyc_helper")
 
 const { BigNumber } = require("ethers");
@@ -28,7 +28,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('TaureumERC721', (accounts) => {
+contract('TaureumERC721Enumerable', (accounts) => {
     let contract
     let web3
 
@@ -66,7 +66,7 @@ contract('TaureumERC721', (accounts) => {
         it('have a name', async()=> {
             const name = await contract.name()
 
-            assert.equal(name, "Taureum ERC721", "contract name invalid")
+            assert.equal(name, "Taureum ERC721Enumerable", "contract name invalid")
         })
 
         it('have a symbol', async()=> {
