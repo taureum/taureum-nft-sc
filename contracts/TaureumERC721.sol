@@ -5,7 +5,6 @@ pragma solidity 0.8.4;
 import "./lib/token/ERC721/ERC721.sol";
 import "./lib/access/AccessControl.sol";
 import "./ITaureumKYC.sol";
-import "./lib/utils/Counters.sol";
 import "./lib/access/Ownable.sol";
 
 contract TaureumERC721 is ERC721, Ownable {
@@ -18,20 +17,6 @@ contract TaureumERC721 is ERC721, Ownable {
      * @dev Mapping from NFT ID to metadata uri.
      */
     mapping(uint256 => string) internal idToUri;
-
-    /**
-     * @dev Mapping from NFT ID to its first owner.
-     */
-    mapping(uint256 => address) internal idToFirstOwner;
-
-    /**
-     * @dev Mapping from NFT ID to the NFT property (encode the tokenData struct).
-     *  - 1st byte determines the license type: 0 => personal license, 1 => full license).
-     *  - Next 32 bytes determine the expiry date (expiry block number): MaxUint => no expiry date.
-     *
-     * TODO: consider adding the URI to this mapping.
-     */
-    mapping(uint256 => bytes) internal idToProperty;
 
     /**
    * @dev Guarantee that _to is able to receive more NFTs.
@@ -47,22 +32,6 @@ contract TaureumERC721 is ERC721, Ownable {
         require(isVerifiedUser || balance < 10, "NFT_COUNT_MAX_EXCEEDED");
         _;
     }
-
-    /**
-     * @dev Guarantee the _tokenId is not expired and transferable.
-     * @param _tokenId The NFT token ID to validate.
-     */
-    modifier transferable(
-        uint256 _tokenId
-    ) {
-        require(_isTransferable(_tokenId), "TOKEN_NOT_TRANSFERABLE");
-        _;
-    }
-
-    /**
-     * @dev Emitted when `tokenId` token is minted for `to`.
-     */
-    event Mint(address indexed to, uint256 indexed tokenId, string uri, uint expiryDate);
 
     /**
      * @dev Create a new TaureumERC721 contract and assign the KYCAddress to _KYCAddress.
@@ -89,20 +58,16 @@ contract TaureumERC721 is ERC721, Ownable {
       *    - `to` cannot receive NFTs.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
-      * @param license The license of the minting NFT (0 - personally-licensed or 1 - fully-licensed).
-      * @param expiryBlock The block number at which the minting NFT is expired.
       */
     function mint(
         address to,
-        string calldata uri,
-        uint8 license,
-        uint expiryBlock
+        string calldata uri
     )
     public
     canReceiveNFT(to)
     returns (uint256)
     {
-        return _mint(to, uri, license, expiryBlock);
+        return _mint(to, uri);
     }
 
     /**
@@ -116,17 +81,6 @@ contract TaureumERC721 is ERC721, Ownable {
     }
 
     /**
-     * @dev Return the properties of an NFT token.
-     * @notice It throws if the tokenId does not exist.
-     * @param _tokenId The NFT tokenID to check.
-     */
-    function getTokenData(uint256 _tokenId) public view returns(bytes memory tokenData) {
-        tokenData = idToProperty[_tokenId];
-        require(tokenData.length == 33, "TOKEN_NOT_EXIST");
-        return tokenData;
-    }
-
-    /**
      * @dev See {IERC721-transferFrom}.
      * @notice It throws an exception if
      *      - the tokenId is not transferable.
@@ -136,7 +90,7 @@ contract TaureumERC721 is ERC721, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public override transferable(tokenId) canReceiveNFT(to) {
+    ) public override canReceiveNFT(to) {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
 
@@ -154,7 +108,7 @@ contract TaureumERC721 is ERC721, Ownable {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) public override transferable(tokenId) canReceiveNFT(to) {
+    ) public override canReceiveNFT(to) {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
         _safeTransfer(from, to, tokenId, _data);
     }
@@ -182,49 +136,20 @@ contract TaureumERC721 is ERC721, Ownable {
       *    - `expiryBlock` is less than the current block number.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
-      * @param license The license of the minting NFT (0 - personally-licensed or 1 - fully-licensed).
-      * @param expiryBlock The block number at which the minting NFT is expired.
       */
     function _mint(
         address to,
-        string calldata uri,
-        uint8 license,
-        uint256 expiryBlock
+        string calldata uri
     )
     internal
     returns (uint256)
     {
-        require(license < 2, "LICENSE_MUST_BE_O_OR_1");
-        require(expiryBlock > block.number, "EXPIRY_DATE_NOT_VALID");
+        uint256 id = uint256(keccak256(abi.encode(to, uri)));
 
-        uint256 id = uint256(keccak256(abi.encode(to, uri, license, expiryBlock)));
         super._mint(to, id);
         _setTokenUri(id, uri);
-        idToFirstOwner[id] = to;
-        idToProperty[id] = abi.encodePacked(license, expiryBlock);
 
         return id;
-    }
-
-    /**
-     * @dev Check if an NFT token is transferable.
-     * @param _tokenId The NFT tokenID to check.
-     */
-    function _isTransferable(uint256 _tokenId) internal view returns (bool) {
-        address firstOwner = idToFirstOwner[_tokenId];
-        bytes memory tokenData = getTokenData(_tokenId);
-
-        uint8 licenseType = uint8(tokenData[0]);
-        if (licenseType != 1 && msg.sender != firstOwner) {
-            return false;
-        }
-
-        uint expiryDate;
-        assembly {
-            tokenData := add(tokenData, 1)
-            expiryDate := mload(add(tokenData, 0x20)) // tokenData[1:33]
-        }
-        return block.number < expiryDate;
     }
 
     /**
