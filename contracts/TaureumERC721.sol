@@ -4,42 +4,20 @@ pragma solidity 0.8.4;
 
 import "./lib/token/ERC721/ERC721.sol";
 import "./lib/access/AccessControl.sol";
-import "./ITaureumKYC.sol";
 import "./lib/access/Ownable.sol";
 
 contract TaureumERC721 is ERC721, Ownable {
-    /**
-     * @dev The contract address for the KYC entry.
-     */
-    address internal _KYCAddress;
-
     /**
      * @dev Mapping from NFT ID to metadata uri.
      */
     mapping(uint256 => string) internal idToUri;
 
     /**
-   * @dev Guarantee that _to is able to receive more NFTs.
-   * @param _to Owner address to validate.
-   */
-    modifier canReceiveNFT(
-        address _to
-    )
-    {
-        uint256 balance = balanceOf(_to);
-        bool isVerifiedUser = ITaureumKYC(_KYCAddress).isVerifiedUser(_to);
-
-        require(isVerifiedUser || balance < 10, "NFT_COUNT_MAX_EXCEEDED");
-        _;
-    }
-
-    /**
      * @dev Create a new TaureumERC721 contract and assign the KYCAddress to _KYCAddress.
      *
      * TODO: change the default name and symbol.
      */
-    constructor(address KYCAddress) ERC721("Taureum ERC721", "Taureum") Ownable() {
-        _KYCAddress = KYCAddress;
+    constructor() ERC721("Taureum ERC721", "Taureum") Ownable() {
     }
 
     /**
@@ -64,9 +42,9 @@ contract TaureumERC721 is ERC721, Ownable {
         string calldata uri
     )
     public
-    canReceiveNFT(to)
     returns (uint256)
     {
+        require(to != address(0), "ZERO_ADDRESS");
         return _mint(to, uri);
     }
 
@@ -90,7 +68,7 @@ contract TaureumERC721 is ERC721, Ownable {
         address from,
         address to,
         uint256 tokenId
-    ) public override canReceiveNFT(to) {
+    ) public override {
         //solhint-disable-next-line max-line-length
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
 
@@ -108,25 +86,9 @@ contract TaureumERC721 is ERC721, Ownable {
         address to,
         uint256 tokenId,
         bytes memory _data
-    ) public override canReceiveNFT(to) {
+    ) public override {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
         _safeTransfer(from, to, tokenId, _data);
-    }
-
-    /**
-     * @dev Reset the `_KYCAddress` to kycAddr.
-     * @notice Only the owner of this contract is able to change the the KYC contract address.
-     */
-    function setKYCImplementation(address kycAddr) onlyOwner external {
-        _KYCAddress = kycAddr;
-    }
-
-    /**
-     * @dev Reset the `_KYCAddress` to kycAddr.
-     * @notice Only the owner of this contract is able to change the the KYC contract address.
-     */
-    function getKYCAddress() public view returns(address) {
-        return _KYCAddress;
     }
 
     /**
