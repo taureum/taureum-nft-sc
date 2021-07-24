@@ -2,7 +2,6 @@ var crypto = require("crypto");
 const {assert} = require('chai')
 const Web3 = require('web3');
 const TaureumNFT = artifacts.require("./TaureumERC721.sol")
-const {addVerifiedUser} = require("./helper/kyc_helper")
 
 const { BigNumber } = require("ethers");
 
@@ -46,11 +45,6 @@ contract('TaureumERC721', (accounts) => {
     before(async () => {
         web3 = new Web3("http://127.0.0.1:7545")
 
-        await addVerifiedUser(anotherVerifiedUser)
-        await addVerifiedUser(newOwner)
-        await addVerifiedUser(approvedUser)
-        await addVerifiedUser(anotherApprovedUser)
-
         contract = await TaureumNFT.deployed()
     })
 
@@ -78,7 +72,7 @@ contract('TaureumERC721', (accounts) => {
 
     describe('minting', async() => {
         it("create a simple NFT", async() => {
-            let uri = "aaaaababababababababababababababababa"
+            let uri = crypto.randomBytes(32).toString('hex');
             const result = await mintToken(contract, verifiedUser, uri)
             let packed = await web3.eth.abi.encodeParameters(['address', 'string'],
                 [verifiedUser, uri])
@@ -103,49 +97,12 @@ contract('TaureumERC721', (accounts) => {
             assert.equal(owner, verifiedUser, "own is invalid")
         })
 
-        it("should be valid for verified accounts", async() => {
-            const count = await contract.balanceOf(verifiedUser)
-            // console.log(`countNFT of ${verifiedUser}: ${count}`)
-            for (let i = 1; i <= 10 - count; i++) {
-                const result = await mintRandomToken(contract, verifiedUser)
-                // console.log(result)
-
-                const event = result.logs[0].args
-                assert.equal(event.from, "0x0000000000000000000000000000000000000000", 'from is incorrect')
-                assert.equal(event.to, verifiedUser, "to is incorrect")
-
-                const balance = await contract.balanceOf(verifiedUser)
-                assert.equal(balance, parseInt(count) + parseInt(i), "balance is incorrect")
-            }
-        })
-
         it("the zero address cannot mint a new NFT", async() => {
             try {
                 await mintRandomToken(contract, zeroAddress)
                 assert.equal(true, false, 'should not pass')
             } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, ERC721_BALANCE_QUERY_FOR_ZERO_ADDRESS), true)
-            }
-        })
-
-        it("unVerifiedUser can only mint upto 10 NFTs", async() => {
-            const count = await contract.balanceOf(notVerifiedUser)
-            // console.log(`countNFT of the unVerifiedUser ${notVerifiedUser}: ${count}`)
-            for (let i = 1; i <= 10 - count; i++) {
-                const result = await mintRandomToken(contract, notVerifiedUser)
-
-                const event = result.logs[0].args
-                assert.equal(event.to, notVerifiedUser, "to is incorrect")
-
-                const balance = await contract.balanceOf(notVerifiedUser)
-                assert.equal(balance, parseInt(count) + parseInt(i), "balance is incorrect")
-            }
-
-            try {
-                await mintRandomToken(contract, notVerifiedUser)
-                assert.equal(true, false, 'should not pass')
-            } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, NFT_COUNT_MAX_EXCEEDED), true)
+                assert.equal(shouldErrorContainMessage(error, ERC721_MINT_TO_ZERO_ADDRESS_ERROR), true)
             }
         })
     })
@@ -307,36 +264,6 @@ contract('TaureumERC721', (accounts) => {
                 // Should throw a NOT_OWNER_OR_APPROVED message
                 assert.equal(shouldErrorContainMessage(error, NOT_OWNER_OR_APPROVED), true)
             }
-        })
-    })
-
-    describe('KYC contract address', async () => {
-        it("contract owner should be able to set new KYC contract address", async() => {
-            //mint a token to test
-            const currentKYCAddress = await contract.getKYCAddress()
-            console.log(`\t currentKYCAddress: ${currentKYCAddress}`)
-
-            //Contract owner should be able to set new KYC contract address
-            let newKYCAddress = '0x20227ba0f3451438ff0311e9b67fcfa8e3ccd57a'
-            await contract.setKYCImplementation(newKYCAddress)
-
-            const tmpNewKYCAddress = await contract.getKYCAddress()
-            console.log(`\t newKYCAddress: ${tmpNewKYCAddress}`)
-            assert.equal(BigNumber.from(tmpNewKYCAddress).toString(),
-                BigNumber.from(newKYCAddress).toString()    ,
-                "KYC address is invalid")
-
-            await contract.setKYCImplementation(currentKYCAddress)
-        })
-
-        it("not contract owner should not be able to set new KYC contract address", async() => {
-            //mint a token to test
-            const currentKYCAddress = await contract.getKYCAddress()
-            console.log(`\t currentKYCAddress: ${currentKYCAddress}`)
-
-            //Contract owner should be able to set new KYC contract address
-            let newKYCAddress = '0x20227ba0f3451438ff0311e9b67fcfa8e3ccd57a'
-            await contract.setKYCImplementation(newKYCAddress, {from: notContractOwner}).should.be.rejected;
         })
     })
 })
