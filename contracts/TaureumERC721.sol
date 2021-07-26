@@ -4,36 +4,47 @@ pragma solidity 0.8.4;
 
 import "./lib/token/ERC721/ERC721.sol";
 import "./lib/access/AccessControl.sol";
-import "./lib/access/Ownable.sol";
 
-contract TaureumERC721 is ERC721, Ownable {
+contract TaureumERC721 is ERC721 {
     /**
      * @dev Mapping from NFT ID to metadata uri.
      */
     mapping(uint256 => string) internal idToUri;
 
     /**
-     * @dev Create a new TaureumERC721 contract and assign the KYCAddress to _KYCAddress.
+     * @dev Create a new TaureumERC721 contract.
      *
      * TODO: change the default name and symbol.
      */
-    constructor() ERC721("Taureum ERC721", "Taureum") Ownable() {
-    }
+    constructor() ERC721("Taureum ERC721", "Taureum") {}
 
     /**
-     * @dev See {IERC165-supportsInterface}.
-     */
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return
-        interfaceId == type(IERC721).interfaceId ||
-        interfaceId == type(IERC721Metadata).interfaceId ||
-        super.supportsInterface(interfaceId);
+      * @dev Safely mint a new NFT.
+      * @notice It throws an exception if
+      *    - `to` is a "ZERO_ADDRESS.
+      *    - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
+      * @param to The address that will own the minted NFT.
+      * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
+      */
+    function safeMint(
+        address to,
+        string calldata uri
+    )
+    public
+    returns (uint256)
+    {
+        uint256 id = uint256(keccak256(abi.encode(to, uri)));
+
+        _safeMint(to, id);
+        _setTokenUri(id, uri);
+
+        return id;
     }
 
     /**
       * @dev Mint a new NFT.
       * @notice It throws an exception if
-      *    - `to` cannot receive NFTs.
+      *    - `to` is a "ZERO_ADDRESS.
       * @param to The address that will own the minted NFT.
       * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
       */
@@ -44,14 +55,18 @@ contract TaureumERC721 is ERC721, Ownable {
     public
     returns (uint256)
     {
-        require(to != address(0), "ZERO_ADDRESS");
-        return _mint(to, uri);
+        uint256 id = uint256(keccak256(abi.encode(to, uri)));
+
+        _mint(to, id);
+        _setTokenUri(id, uri);
+
+        return id;
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
         string memory baseURI = _baseURI();
@@ -59,66 +74,10 @@ contract TaureumERC721 is ERC721, Ownable {
     }
 
     /**
-     * @dev See {IERC721-transferFrom}.
-     * @notice It throws an exception if
-     *      - the tokenId is not transferable.
-     *      - the receiver `to` cannot receive more TaureumNFTs.
-     */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public override {
-        //solhint-disable-next-line max-line-length
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-
-        _transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev See {IERC721-safeTransferFrom}.
-     * @notice It throws an exception if
-     *      - the tokenId is not transferable.
-     *      - the receiver `to` cannot receive more TaureumNFTs.
-     */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory _data
-    ) public override {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: transfer caller is not owner nor approved");
-        _safeTransfer(from, to, tokenId, _data);
-    }
-
-    /**
-      * @dev Mint a new NFT.
-      * @notice It throws an exception if
-      *    - `license` is not valid.
-      *    - `expiryBlock` is less than the current block number.
-      * @param to The address that will own the minted NFT.
-      * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
-      */
-    function _mint(
-        address to,
-        string calldata uri
-    )
-    internal
-    returns (uint256)
-    {
-        uint256 id = uint256(keccak256(abi.encode(to, uri)));
-
-        super._mint(to, id);
-        _setTokenUri(id, uri);
-
-        return id;
-    }
-
-    /**
      * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
      * token will be the concatenation of the `baseURI` and the `tokenId`.
      */
-    function _baseURI() internal pure override returns (string memory) {
+    function _baseURI() internal pure virtual override returns (string memory) {
         return "ipfs://";
     }
 
