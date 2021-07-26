@@ -54,9 +54,8 @@ contract TaureumNFTLazyMint is TaureumERC721Enumerable, EIP712, AccessControl {
     function redeem(address minter, address redeemer, string calldata uri, bytes calldata signature)
     external
     {
-        require(minter == _verify(_hash(minter, uri), signature));
+        require(minter == _verify(_hash(uri), signature));
         require(hasRole(MINTER_ROLE, minter), "INVALID_MINTER_ROLE");
-        require(_verify(minter, _hash(minter, uri), signature), "Invalid signature");
 
         // mint the token to the signer
         uint256 id = mint(minter, uri);
@@ -72,7 +71,7 @@ contract TaureumNFTLazyMint is TaureumERC721Enumerable, EIP712, AccessControl {
     internal view returns (bytes32)
     {
         return _hashTypedDataV4(keccak256(abi.encode(
-                keccak256("TaureumNFT(address owner,string uri)"),
+                keccak256("TaureumNFT(string uri)"),
                 keccak256(bytes(uri))
             )));
     }
@@ -81,7 +80,7 @@ contract TaureumNFTLazyMint is TaureumERC721Enumerable, EIP712, AccessControl {
      * @dev Returns the signer for a pair of digested message and singature.
      */
     function _verify(bytes32 digest, bytes memory signature)
-    internal pure returns (bool)
+    internal pure returns (address)
     {
         return ECDSA.recover(digest, signature);
     }
