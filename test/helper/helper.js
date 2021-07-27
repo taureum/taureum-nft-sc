@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 async function mintToken(contract, owner, uri) {
     if (owner === '0x0000000000000000000000000000000000000000') {
         return await contract.mint(owner, uri)
@@ -19,4 +21,8 @@ async function wait(timeOut) {
     });
 }
 
-module.exports = {mintToken, mintRandomToken, wait}
+function randomURI() {
+    return crypto.randomBytes(32).toString('hex');
+}
+
+module.exports = {mintToken, mintRandomToken, wait, randomURI}

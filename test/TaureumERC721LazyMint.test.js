@@ -1,18 +1,12 @@
-const {assert} = require('chai')
+const {assert, expect} = require('chai')
 const Web3 = require('web3');
-const contractInstance = artifacts.require("./TaureumNFTLazyMint.sol")
+const contractInstance = artifacts.require("./TaureumERC721LazyMint.sol")
 const {randomURI} = require("./helper/helper")
-const {LazyMinter} = require("./helper/lazy-minter")
+const {LazyMinter, randomRedeemData} = require("./helper/lazy-minter")
 
 const {
-    ERC721_MINT_TO_ZERO_ADDRESS_ERROR,
-    ERC721_BALANCE_QUERY_FOR_ZERO_ADDRESS,
-    NOT_OWNER_OR_APPROVED,
-    TOKEN_NOT_TRANSFERABLE,
-    NFT_COUNT_MAX_EXCEEDED,
-    URI_EXISTS,
-    EXPIRY_DATE_NOT_VALID,
-    NOT_CONTRACT_OWNER,
+    ERC721_TOKEN_ALREADY_MINTED,
+    ERC721_MUST_BE_OWNER_OR_APPROVED,
     shouldErrorContainMessage,
 } = require("./helper/errors")
 
@@ -26,36 +20,104 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+const checkRedeemEvents = async (logs, tokenId, minter, redeemer) => {
+    let mintEvent = logs[0].args
+    let clearApprovalEvent = logs[1].args
+    let transferredEvent = logs[2].args
+
+    assert.equal(mintEvent.from, ZERO_ADDRESS, "mint `from` is invalid")
+    assert.equal(mintEvent.to, minter, "mint `to` is invalid")
+    assert.equal(mintEvent.tokenId.toString("hex"), tokenId, "mint `tokenId` is invalid")
+
+    assert.equal(clearApprovalEvent.owner, minter, "clearApproval `from` is invalid")
+    assert.equal(clearApprovalEvent.approved, ZERO_ADDRESS, "clearApproval `to` is invalid")
+    assert.equal(clearApprovalEvent.tokenId.toString("hex"), tokenId, "clearApproval `tokenId` is invalid")
+
+    assert.equal(transferredEvent.from, minter, "transfer `from` is invalid")
+    assert.equal(transferredEvent.to, redeemer, "transfer `to` is invalid")
+    assert.equal(transferredEvent.tokenId.toString("hex"), tokenId, "transfer `tokenId` is invalid")
+}
+
 contract('TaureumNFTLazyMint', (accounts) => {
     let instance
     let web3
     let address
+    let rpcHost = "http://127.0.0.1:7545"
 
     let minter = accounts[0]
-    let notMinter = accounts[1]
-    let signer = accounts[2]
+    let approved = accounts[1]
+    let notApproved = accounts[2]
     let redeemer = accounts[3]
-    let contractOwner = accounts[0]
+    let chainId
 
     before(async () => {
-        web3 = new Web3("http://127.0.0.1:7545")
-
-        await addVerifiedUser(signer)
+        web3 = new Web3(rpcHost)
+        chainId = await web3.eth.getChainId()
 
         instance = await contractInstance.deployed()
         address = await instance.address
+
+        await instance.setApprovalForAll(approved, true)
     })
 
-    describe('redeem', async() => {
-        it('the minter should be able to call the `redeem` function', async()=> {
-            let lm = new LazyMinter({contractAddress: address, signer: minter})
-            let uri = randomURI()
+    describe('Redeem', async () => {
+        it('should redeem an NFT from a valid signature (sent by owner)', async () => {
+            let lazyMintData = await randomRedeemData(address, minter, rpcHost)
 
-            let lazyMintData = await lm.createLazyMintingData(uri)
-            console.log("lazyMintData", lazyMintData)
+            let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
+            await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
 
-            let result = await instance.redeem(minter, redeemer, uri, lazyMintData.signature)
-            console.log("result", result)
+            let owner = await instance.ownerOf(lazyMintData.expectedTokenId)
+            assert.equal(owner, redeemer, "owner not valid")
+        })
+
+        it('should redeem an NFT from a valid signature (sent by approved)', async () => {
+            let lazyMintData = await randomRedeemData(address, minter, rpcHost)
+
+            let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: approved})
+            await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
+
+            let owner = await instance.ownerOf(lazyMintData.expectedTokenId)
+            assert.equal(owner, redeemer, "owner not valid")
+        })
+
+        it('should fail to redeem an NFT from a valid signature but sent by notApproved)', async () => {
+            let lazyMintData = await randomRedeemData(address, minter, rpcHost)
+
+            try {
+                await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: notApproved})
+                assert.equal(true, false)
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, ERC721_MUST_BE_OWNER_OR_APPROVED), true, "should contain error")
+            }
+        })
+
+        it('should fail to redeem an already-been-redeemed NFT', async () => {
+            let lazyMintData = await randomRedeemData(address, minter, rpcHost)
+
+            let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
+            await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
+
+            try {
+                await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
+                assert.equal(true, false)
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED), true, "should contain error")
+            }
+        })
+
+        it('should fail to redeem an already-been-minted NFT', async () => {
+            let lazyMintData = await randomRedeemData(address, minter, rpcHost)
+
+            await mintToken(instance, minter, lazyMintData.uri)
+            try {
+                await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
+                assert.equal(true, false)
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED), true, "should contain error")
+            }
         })
     })
 })
