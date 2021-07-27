@@ -25,4 +25,13 @@ function randomURI() {
     return crypto.randomBytes(32).toString('hex');
 }
 
-module.exports = {mintToken, mintRandomToken, wait, randomURI}
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+const pad = (data, l) => {
+    if (data.length < l) {
+        return new Array(l + 1 - data.length).join("0") + data
+    }
+    return data
+}
+
+module.exports = {mintToken, mintRandomToken, wait, randomURI, pad, ZERO_ADDRESS}
