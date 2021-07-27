@@ -1,15 +1,12 @@
 const Web3 = require("web3")
 const {randomURI} = require("./helper")
 
-const SIGNING_DOMAIN_NAME = "TaureumNFT"
-const SIGNING_DOMAIN_VERSION = "1"
-
 class LazyMinter {
     constructor({contractAddress, signer, rpcHost}) {
         this.contractAddress = contractAddress
         this.signer = signer
         this.web3 = new Web3(rpcHost)
-        this.hashedName = this.web3.utils.soliditySha3(SIGNING_DOMAIN_NAME)
+        this.hashedName = this.web3.utils.soliditySha3({type: "string", value: "TaureumNFT"})
         this.hashedVersion = this.web3.utils.soliditySha3({type: "string", value: "1"})
         this.typeHash = this.web3.utils.soliditySha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     }

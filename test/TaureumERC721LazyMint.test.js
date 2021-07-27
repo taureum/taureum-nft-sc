@@ -1,8 +1,8 @@
-const {assert, expect} = require('chai')
+const {assert} = require('chai')
 const Web3 = require('web3');
 const contractInstance = artifacts.require("./TaureumERC721LazyMint.sol")
+const {randomRedeemData} = require("./helper/lazy-minter")
 const {randomURI} = require("./helper/helper")
-const {LazyMinter, randomRedeemData} = require("./helper/lazy-minter")
 
 const {
     ERC721_TOKEN_ALREADY_MINTED,
@@ -40,6 +40,13 @@ const checkRedeemEvents = async (logs, tokenId, minter, redeemer) => {
     assert.equal(transferredEvent.tokenId.toString("hex"), tokenId, "transfer `tokenId` is invalid")
 }
 
+const redeemShouldSuccess = async (instance, result, lazyMintData, minter, redeemer) => {
+    await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
+
+    let owner = await instance.ownerOf(lazyMintData.expectedTokenId)
+    assert.equal(owner, redeemer, "owner not valid")
+}
+
 contract('TaureumNFTLazyMint', (accounts) => {
     let instance
     let web3
@@ -62,15 +69,12 @@ contract('TaureumNFTLazyMint', (accounts) => {
         await instance.setApprovalForAll(approved, true)
     })
 
-    describe('Redeem', async () => {
+    describe('Lazy Minting', async () => {
         it('should redeem an NFT from a valid signature (sent by owner)', async () => {
             let lazyMintData = await randomRedeemData(address, minter, rpcHost)
 
             let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
-            await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
-
-            let owner = await instance.ownerOf(lazyMintData.expectedTokenId)
-            assert.equal(owner, redeemer, "owner not valid")
+            await redeemShouldSuccess(instance, result, lazyMintData, minter, redeemer)
         })
 
         it('should redeem an NFT from a valid signature (sent by approved)', async () => {
@@ -83,7 +87,7 @@ contract('TaureumNFTLazyMint', (accounts) => {
             assert.equal(owner, redeemer, "owner not valid")
         })
 
-        it('should fail to redeem an NFT from a valid signature but sent by notApproved)', async () => {
+        it('should fail to redeem an NFT from a valid signature but sent by notApproved', async () => {
             let lazyMintData = await randomRedeemData(address, minter, rpcHost)
 
             try {
@@ -117,6 +121,17 @@ contract('TaureumNFTLazyMint', (accounts) => {
                 assert.equal(true, false)
             } catch (error) {
                 assert.equal(shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED), true, "should contain error")
+            }
+        })
+
+        it('should fail to redeem an NFT with modified URI', async () => {
+            let lazyMintData = await randomRedeemData(address, minter, rpcHost)
+            lazyMintData.uri = randomURI()
+            try {
+                await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
+                assert.equal(true, false)
+            } catch (error) {
+                assert.equal(shouldErrorContainMessage(error, ERC721_MUST_BE_OWNER_OR_APPROVED), true, "should contain error")
             }
         })
     })
