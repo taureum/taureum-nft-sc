@@ -34,6 +34,7 @@ contract TaureumERC721LazyMint is TaureumERC721Enumerable, EIP712 {
      * @notice It throws if
      *      - `msg.sender` is not the `minter` or has not been approved by the `minter`.
      *      - redeem data and signature are not valid.
+     *      - if the redeemer is a contract and it cannot receive the NFT.
      * @param redeemer The address that the minted NFT will be transferred to.
      * @param uri The URI consists of metadata description of the minting NFT on the IPFS (without prefix).
      * @param signature The signature signed by `to` designating `msg.sender` to mint the NFT for it.
@@ -48,7 +49,7 @@ contract TaureumERC721LazyMint is TaureumERC721Enumerable, EIP712 {
         uint256 id = mint(minter, uri);
 
         // transfer the minted token to the redeemer
-        _transfer(minter, redeemer, id);
+        _safeTransfer(minter, redeemer, id, "");
 
         emit Redeem(minter, redeemer, uri, signature);
     }
