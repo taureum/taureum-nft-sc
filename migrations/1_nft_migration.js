@@ -15,11 +15,11 @@ module.exports = async function (deployer, network) {
         // setConfig('deployed.' + network + '.TaureumERC721', mainContractAddress)
         // console.log("Main contract deployed at address", mainContractAddress)
 
-        await deployer.deploy(TaureumNFTEnum);
-        mainContract = await TaureumNFTEnum.deployed();
-        mainContractAddress = await mainContract.address
-        setConfig('deployed.' + network + '.TaureumERC721Enumerable', mainContractAddress)
-        console.log("Main contract (enumerable) deployed at address", mainContractAddress)
+        // await deployer.deploy(TaureumNFTEnum);
+        // mainContract = await TaureumNFTEnum.deployed();
+        // mainContractAddress = await mainContract.address
+        // setConfig('deployed.' + network + '.TaureumERC721Enumerable', mainContractAddress)
+        // console.log("Main contract (enumerable) deployed at address", mainContractAddress)
 
         await deployer.deploy(TaureumNFTLazyMint);
         mainContract = await TaureumNFTLazyMint.deployed();
