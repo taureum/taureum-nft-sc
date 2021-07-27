@@ -59,7 +59,7 @@ contract('LazyMint', (accounts) => {
         await instance.setApprovalForAll(approved, true)
     })
 
-    describe('Lazy Minting', async () => {
+    describe('redeem', async () => {
         it('should redeem an NFT from a valid signature (sent by owner)', async () => {
             let lazyMintData = await randomRedeemData(address, minter)
 
@@ -71,10 +71,7 @@ contract('LazyMint', (accounts) => {
             let lazyMintData = await randomRedeemData(address, minter)
 
             let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: approved})
-            await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
-
-            let owner = await instance.ownerOf(lazyMintData.expectedTokenId)
-            assert.equal(owner, redeemer, "owner not valid")
+            await redeemShouldSucceed(instance, result, lazyMintData, minter, redeemer)
         })
 
         it('should fail to redeem an NFT from a valid signature but sent by notApproved', async () => {
