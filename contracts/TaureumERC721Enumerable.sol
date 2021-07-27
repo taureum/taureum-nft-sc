@@ -33,7 +33,7 @@ contract TaureumERC721Enumerable is TaureumERC721, ERC721Enumerable {
      * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
      * token will be the concatenation of the `baseURI` and the `tokenId`.
      */
-    function _baseURI() internal pure override(ERC721, TaureumERC721) returns (string memory) {
+    function _baseURI() internal view override(ERC721, TaureumERC721) returns (string memory) {
         return TaureumERC721._baseURI();
     }
 

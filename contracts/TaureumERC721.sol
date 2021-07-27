@@ -3,20 +3,26 @@
 pragma solidity 0.8.4;
 
 import "./lib/token/ERC721/ERC721.sol";
-import "./lib/access/AccessControl.sol";
+import "./lib/access/Ownable.sol";
 
-contract TaureumERC721 is ERC721 {
+contract TaureumERC721 is ERC721, Ownable {
     /**
      * @dev Mapping from NFT ID to metadata uri.
      */
     mapping(uint256 => string) internal idToUri;
 
     /**
+     * @dev The base URI for all NFT.
+     */
+    string private __baseURI;
+
+    /**
      * @dev Create a new TaureumERC721 contract.
      *
-     * TODO: change the default name and symbol.
      */
-    constructor() ERC721("Taureum ERC721", "Taureum") {}
+    constructor() ERC721("Taureum ERC721", "Taureum") Ownable() {
+        __baseURI = "";
+    }
 
     /**
       * @dev Safely mint a new NFT.
@@ -74,11 +80,18 @@ contract TaureumERC721 is ERC721 {
     }
 
     /**
+     * @dev Sets new value for the `baseURI`. This operation can only been done by the owner of this contract.
+     */
+    function setBaseURI(string memory newBaseURI) external onlyOwner {
+        __baseURI = newBaseURI;
+    }
+
+    /**
      * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
      * token will be the concatenation of the `baseURI` and the `tokenId`.
      */
-    function _baseURI() internal pure virtual override returns (string memory) {
-        return "ipfs://";
+    function _baseURI() internal view virtual override returns (string memory) {
+        return __baseURI;
     }
 
     /**
