@@ -10,7 +10,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Enumerable', (accounts) => {
+contract('ERC721Enumerable', (accounts) => {
     let instance
 
     let owner = accounts[0]

@@ -2,11 +2,12 @@ const {assert} = require('chai')
 const {contractName} = require("./helper/load")
 const {randomRedeemData} = require("./helper/lazy-minter")
 const {randomURI} = require("./helper/helper")
+const {checkTransferEvent, checkApproveEvent} = require("./helper/events")
 
 const {
     ERC721_TOKEN_ALREADY_MINTED,
     ERC721_MUST_BE_OWNER_OR_APPROVED,
-    shouldErrorContainMessage,
+    shouldErrorContainMessage, shouldNotPass,
 } = require("./helper/errors")
 
 const {
@@ -22,19 +23,24 @@ require('chai')
 const checkRedeemEvents = async (logs, tokenId, minter, redeemer) => {
     let mintEvent = logs[0].args
     let clearApprovalEvent = logs[1].args
-    let transferredEvent = logs[2].args
+    let transferEvent = logs[2].args
 
-    assert.equal(mintEvent.from, ZERO_ADDRESS, "mint `from` is invalid")
-    assert.equal(mintEvent.to, minter, "mint `to` is invalid")
-    assert.equal(pad(mintEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "mint `tokenId` is invalid")
+    await checkTransferEvent(mintEvent, tokenId, ZERO_ADDRESS, minter)
+    await checkApproveEvent(clearApprovalEvent, tokenId, minter, ZERO_ADDRESS)
+    await checkTransferEvent(transferEvent, tokenId, minter, redeemer)
 
-    assert.equal(clearApprovalEvent.owner, minter, "clearApproval `from` is invalid")
-    assert.equal(clearApprovalEvent.approved, ZERO_ADDRESS, "clearApproval `to` is invalid")
-    assert.equal(pad(clearApprovalEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "clearApproval `tokenId` is invalid")
 
-    assert.equal(transferredEvent.from, minter, "transfer `from` is invalid")
-    assert.equal(transferredEvent.to, redeemer, "transfer `to` is invalid")
-    assert.equal(pad(transferredEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "transfer `tokenId` is invalid")
+    // assert.equal(mintEvent.from, ZERO_ADDRESS, "mint `from` is invalid")
+    // assert.equal(mintEvent.to, minter, "mint `to` is invalid")
+    // assert.equal(pad(mintEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "mint `tokenId` is invalid")
+
+    // assert.equal(clearApprovalEvent.owner, minter, "clearApproval `from` is invalid")
+    // assert.equal(clearApprovalEvent.approved, ZERO_ADDRESS, "clearApproval `to` is invalid")
+    // assert.equal(pad(clearApprovalEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "clearApproval `tokenId` is invalid")
+    //
+    // assert.equal(transferEvent.from, minter, "transfer `from` is invalid")
+    // assert.equal(transferEvent.to, redeemer, "transfer `to` is invalid")
+    // assert.equal(pad(transferEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "transfer `tokenId` is invalid")
 }
 const redeemShouldSucceed = async (instance, result, lazyMintData, minter, redeemer) => {
     await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
@@ -43,7 +49,7 @@ const redeemShouldSucceed = async (instance, result, lazyMintData, minter, redee
     assert.equal(owner, redeemer, "owner not valid")
 }
 
-contract('LazyMint', (accounts) => {
+contract('ERC721 with LazyMint', (accounts) => {
     let instance
     let address
 
@@ -79,9 +85,9 @@ contract('LazyMint', (accounts) => {
 
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: notApproved})
-                assert.equal(true, false)
+                shouldNotPass()
             } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, ERC721_MUST_BE_OWNER_OR_APPROVED), true, "should contain error")
+                shouldErrorContainMessage(error, ERC721_MUST_BE_OWNER_OR_APPROVED)
             }
         })
 
@@ -92,9 +98,9 @@ contract('LazyMint', (accounts) => {
             await redeemShouldSucceed(instance, result, lazyMintData, minter, redeemer)
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
-                assert.equal(true, false)
+                shouldNotPass()
             } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED), true, "should contain error")
+                shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED)
             }
         })
 
@@ -104,9 +110,9 @@ contract('LazyMint', (accounts) => {
             await mintToken(instance, minter, lazyMintData.uri)
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
-                assert.equal(true, false)
+                shouldNotPass()
             } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED), true, "should contain error")
+                shouldErrorContainMessage(error, ERC721_TOKEN_ALREADY_MINTED)
             }
         })
 
@@ -115,9 +121,9 @@ contract('LazyMint', (accounts) => {
             lazyMintData.uri = randomURI()
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
-                assert.equal(true, false)
+                shouldNotPass()
             } catch (error) {
-                assert.equal(shouldErrorContainMessage(error, ERC721_MUST_BE_OWNER_OR_APPROVED), true, "should contain error")
+                shouldErrorContainMessage(error, ERC721_MUST_BE_OWNER_OR_APPROVED)
             }
         })
     })
