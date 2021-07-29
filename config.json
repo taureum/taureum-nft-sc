@@ -2,12 +2,14 @@
   "deployed": {
     "development": {
       "TaureumKYCMock": "0x72be04Ce0A170ABe1A3a87884DeF4011C9D76DC2",
-      "TaureumERC721": "0x7BA4ffBCFFA02dE53f90BdFF2D55C75ed9560567",
-      "TaureumERC721Enumerable": "0xDaEcffeac61C7bA7a82352D98eD8c33b8F7CDf2a"
+      "TaureumERC721": "0xa7EcfD4F9cb70891A4d7AecFDf8f92Ef093311fA",
+      "TaureumERC721Enumerable": "0x485ECb2260CE814d64516fd2C1761ABD352393EB",
+      "TaureumERC721LazyMint": "0x290086EF3551475C0899eA8BEa023ed93b1143a9"
     },
     "testnet": {
       "TaureumERC721": "0x0D5Fcb002FF2AebD456E62F7635Ae5A2318260dD",
-      "TaureumERC721Enumerable": "0xD168238650A8e8dacEF137788A15367e9C7e8b1f"
+      "TaureumERC721Enumerable": "0xD168238650A8e8dacEF137788A15367e9C7e8b1f",
+      "TaureumERC721LazyMint": "0x514d5Dd6b978701c709B4cD71eAc13C595BCad37"
     }
   }
 }
