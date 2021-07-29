@@ -1,20 +1,20 @@
 const {assert} = require('chai')
-const {contractName} = require("./helper/load")
-const {randomRedeemData} = require("./helper/lazy-minter")
-const {randomURI} = require("./helper/helper")
-const {checkTransferEvent, checkApproveEvent} = require("./helper/events")
+const {contractName} = require("./helper/ERC721/load")
+const {randomRedeemData} = require("./helper/ERC721/lazy-minter")
+const {randomURI} = require("./helper/ERC721/helper")
+const {checkTransferEvent, checkApproveEvent} = require("./helper/ERC721/events")
 
 const {
     ERC721_TOKEN_ALREADY_MINTED,
     ERC721_MUST_BE_OWNER_OR_APPROVED,
     shouldErrorContainMessage, shouldNotPass,
-} = require("./helper/errors")
+} = require("./helper/ERC721/errors")
 
 const {
     ZERO_ADDRESS,
     pad,
     mintToken,
-} = require("./helper/helper")
+} = require("./helper/ERC721/helper")
 
 require('chai')
     .use(require('chai-as-promised'))

@@ -1,10 +1,10 @@
 const {assert} = require('chai')
-const {contractName} = require("./helper/load")
-const {shouldSupportInterfaces} = require("./helper/SupportsInterface.behaviors")
+const {contractName} = require("./helper/ERC721/load")
+const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
 
 const {
     mintRandomToken,
-} = require("./helper/helper")
+} = require("./helper/ERC721/helper")
 
 require('chai')
     .use(require('chai-as-promised'))

@@ -1,21 +1,21 @@
 var crypto = require("crypto");
 const {assert, expect} = require('chai')
-const {contractName, web3} = require("./helper/load")
-const {shouldSupportInterfaces} = require("./helper/SupportsInterface.behaviors")
-const {checkApproveEvent, checkTransferEvent, checkApprovalForAllEvent} = require("./helper/events")
+const {contractName, web3} = require("./helper/ERC721/load")
+const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
+const {checkApproveEvent, checkTransferEvent, checkApprovalForAllEvent} = require("./helper/ERC721/events")
 
 const {
     NOT_CONTRACT_OWNER,
     ERC721_METADATA_URI_QUERY_FOR_NONEXISTENT_TOKEN,
     shouldErrorContainMessage,
     shouldNotPass,
-} = require("./helper/errors")
+} = require("./helper/ERC721/errors")
 
 const {
     ZERO_ADDRESS,
     mintToken,
     mintRandomToken,
-} = require("./helper/helper")
+} = require("./helper/ERC721/helper")
 
 require('chai')
     .use(require('chai-as-promised'))
