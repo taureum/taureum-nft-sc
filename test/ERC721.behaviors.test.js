@@ -1,6 +1,7 @@
 var crypto = require("crypto");
 const {assert} = require('chai')
 const {contractName, web3} = require("./helper/load")
+const {shouldSupportInterfaces} = require("./helper/SupportsInterface.behaviors")
 
 const {
     ERC721_MINT_TO_ZERO_ADDRESS_ERROR,
@@ -79,6 +80,14 @@ contract('ERC721 + metadata', (accounts) => {
         instance = await contractName.deployed()
     })
 
+    describe("supportInterfaces", async () => {
+        await shouldSupportInterfaces(contractName, [
+            'ERC165',
+            'ERC721',
+            "ERC721Metadata",
+        ]);
+    })
+
     describe('deployment', async() => {
         it('deploy successfully', async()=> {
             const addr = await instance.address
@@ -105,7 +114,7 @@ contract('ERC721 + metadata', (accounts) => {
         it("create a simple NFT", async() => {
             let uri = crypto.randomBytes(32).toString('hex');
             const result = await mintToken(instance, owner, uri)
-            let packed = await web3.eth.abi.encodeParameters(['address', 'string'],
+            let packed = web3.eth.abi.encodeParameters(['address', 'string'],
                 [owner, uri])
             let expectedTokenID = web3.utils.soliditySha3(packed)
 
