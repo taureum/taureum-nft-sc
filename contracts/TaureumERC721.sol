@@ -75,15 +75,21 @@ contract TaureumERC721 is ERC721, Ownable {
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-        string memory baseURI = _baseURI();
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, idToUri[tokenId])) : idToUri[tokenId];
+        return bytes(__baseURI).length > 0 ? string(abi.encodePacked(__baseURI, idToUri[tokenId])) : idToUri[tokenId];
     }
 
     /**
-     * @dev Sets new value for the `baseURI`. This operation can only been done by the owner of this contract.
+     * @dev Sets new value for the `__baseURI`. This operation can only been done by the owner of this contract.
      */
     function setBaseURI(string memory newBaseURI) external onlyOwner {
         __baseURI = newBaseURI;
+    }
+
+    /**
+     * @dev Returns `__baseURI`.
+     */
+    function baseURI() external view returns(string memory) {
+        return __baseURI;
     }
 
     /**
