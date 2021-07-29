@@ -2,8 +2,8 @@
 
 pragma solidity 0.8.4;
 
-import "./lib/token/ERC721/ERC721.sol";
-import "./lib/access/Ownable.sol";
+import "../../lib/token/ERC721/ERC721.sol";
+import "../../lib/access/Ownable.sol";
 
 contract TaureumERC721 is ERC721, Ownable {
     /**

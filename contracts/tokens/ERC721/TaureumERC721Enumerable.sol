@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.4;
 
-import "./lib/token/ERC721/extensions/ERC721Enumerable.sol";
 import "./TaureumERC721.sol";
+import "../../lib/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract TaureumERC721Enumerable is TaureumERC721, ERC721Enumerable {
     /**

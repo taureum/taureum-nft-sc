@@ -2,10 +2,8 @@
 
 pragma solidity 0.8.4;
 
-import "./lib/access/AccessControl.sol";
-import "./lib/utils/cryptography/ECDSA.sol";
-import "./lib/utils/cryptography/draft-EIP712.sol";
 import "./TaureumERC721Enumerable.sol";
+import "../../lib/utils/cryptography/draft-EIP712.sol";
 
 contract TaureumERC721LazyMint is TaureumERC721Enumerable, EIP712 {
     string private constant SIGNING_DOMAIN = "TaureumNFT";
