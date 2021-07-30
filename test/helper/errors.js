@@ -1,4 +1,4 @@
-import {assert} from "chai";
+const {assert} = require("chai");
 
 const REVERT_ERROR_MESSAGE = "should contain error"
 const REVERT_MESSAGE = "should not pass"

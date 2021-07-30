@@ -1,4 +1,4 @@
-const {crypto} = require("crypto");
+const crypto = require("crypto");
 const {assert} = require('chai')
 const {contractName} = require("./helper/ERC721/load")
 const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
@@ -14,8 +14,8 @@ const {
 } = require("./helper/errors")
 
 const {
-    mintToken,
-} = require("./helper/ERC721/helper")
+    ERC721_mintToken,
+} = require("./helper/helper")
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -75,7 +75,7 @@ contract('ERC721Metadata', (accounts) => {
             await instance.setBaseURI(baseURI, {from: contractOwner})
 
             let uri = crypto.randomBytes(32).toString("hex")
-            let result = await mintToken(instance, contractOwner, uri)
+            let result = await ERC721_mintToken(instance, contractOwner, uri)
             let tokenId = result.logs[0].args.tokenId
 
             let fullURI = await instance.tokenURI(tokenId)

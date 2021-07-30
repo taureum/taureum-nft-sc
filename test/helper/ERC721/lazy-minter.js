@@ -1,5 +1,5 @@
 const Web3 = require("web3")
-const {randomURI} = require("./helper")
+const {randomURI} = require("../helper")
 const {web3} = require("./load")
 
 class LazyMinter {

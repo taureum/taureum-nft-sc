@@ -3,8 +3,8 @@ const {contractName} = require("./helper/ERC721/load")
 const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
 
 const {
-    mintRandomToken,
-} = require("./helper/ERC721/helper")
+    ERC721_mintRandomToken,
+} = require("./helper/helper")
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -27,7 +27,7 @@ contract('ERC721Enumerable', (accounts) => {
         it('should return the correct total token supply when minting a new token', async()=> {
             let oldSupply = await instance.totalSupply()
 
-            await mintRandomToken(instance, owner)
+            await ERC721_mintRandomToken(instance, owner)
 
             let newSupply = await instance.totalSupply()
 

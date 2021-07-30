@@ -23,9 +23,9 @@ const {
 
 const {
     ZERO_ADDRESS,
-    mintToken,
-    mintRandomToken,
-} = require("./helper/ERC721/helper")
+    ERC721_mintToken,
+    ERC721_mintRandomToken,
+} = require("./helper/helper")
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -66,7 +66,7 @@ const approveForAllShouldSucceed = async (instance, result, owner, operator, app
     assert.equal(isApproveForAll, approved, "isApprovedForAll is invalid")
 }
 
-contract('ERC721 + metadata', (accounts) => {
+contract('ERC721', (accounts) => {
     let instance
 
     let owner = accounts[0]
@@ -118,7 +118,7 @@ contract('ERC721 + metadata', (accounts) => {
     describe('minting', async () => {
         it("create a simple NFT", async () => {
             let uri = crypto.randomBytes(32).toString('hex');
-            const result = await mintToken(instance, owner, uri)
+            const result = await ERC721_mintToken(instance, owner, uri)
             let packed = web3.eth.abi.encodeParameters(['address', 'string'],
                 [owner, uri])
             let expectedTokenID = web3.utils.soliditySha3(packed)
@@ -128,7 +128,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("the zero address cannot mint a new NFT", async () => {
             try {
-                await mintRandomToken(instance, ZERO_ADDRESS)
+                await ERC721_mintRandomToken(instance, ZERO_ADDRESS)
                 assert.equal(true, false, 'should not pass')
             } catch (error) {
                 shouldErrorContainMessage(error, ERC721_MINT_TO_ZERO_ADDRESS_ERROR)
@@ -140,7 +140,7 @@ contract('ERC721 + metadata', (accounts) => {
         it("should update balance of an owner when minting new tokens", async () => {
             let oldBalance = await instance.balanceOf(owner)
 
-            await mintRandomToken(instance, owner)
+            await ERC721_mintRandomToken(instance, owner)
 
             let newBalance = await instance.balanceOf(owner)
             assert.equal(newBalance.toNumber(), oldBalance.toNumber() + 1, "invalid balance")
@@ -164,7 +164,7 @@ contract('ERC721 + metadata', (accounts) => {
     describe("ownerOf", async () => {
         it("should return the owner of a valid tokenId", async () => {
             let uri = crypto.randomBytes(32).toString('hex');
-            await mintToken(instance, owner, uri)
+            await ERC721_mintToken(instance, owner, uri)
             let packed = web3.eth.abi.encodeParameters(['address', 'string'],
                 [owner, uri])
             let tokenId = web3.utils.soliditySha3(packed)
@@ -216,7 +216,7 @@ contract('ERC721 + metadata', (accounts) => {
 
     describe("approve + getApproved", async () => {
         it("owner should be able approve other to use its tokens", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -225,7 +225,7 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("operator should be able approve other to use the owner's tokens", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -236,7 +236,7 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("should be able to approve a second time, doing this will clear the Approval for the first user", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -248,7 +248,7 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("should be able to approve the ZERO_ADDRESS", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -257,7 +257,7 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("cannot approve a not-owned tokenId", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -271,7 +271,7 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("cannot approve self", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -300,7 +300,7 @@ contract('ERC721 + metadata', (accounts) => {
     describe('transferFrom', async () => {
         it("owner should be able to transfer its token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -311,7 +311,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("approved should be able to transfer a token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -324,7 +324,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("newOwner should be able to transfer the token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -338,7 +338,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("oldOwner should not be able to transfer the previously-owned token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -356,7 +356,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("should not be able to transfer to the zero address", async () => {
             try {
-                let result = await mintRandomToken(instance, owner)
+                let result = await ERC721_mintRandomToken(instance, owner)
                 const event = result.logs[0].args
                 let tokenId = event.tokenId
                 await instance.transferFrom(owner, ZERO_ADDRESS, tokenId, {from: owner})
@@ -378,7 +378,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("notApprovedUser should not be able to transfer a token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -393,11 +393,11 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("approvedForAll user should be able to transfer all tokens of the approving user", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             let event = result.logs[0].args
             let tokenId1 = event.tokenId
 
-            result = await mintRandomToken(instance, owner, 1)
+            result = await ERC721_mintRandomToken(instance, owner, 1)
             event = result.logs[0].args
             let tokenId2 = event.tokenId
 
@@ -414,11 +414,11 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("revoking approvalForAll should work", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             let event = result.logs[0].args
             let tokenId1 = event.tokenId
 
-            result = await mintRandomToken(instance, owner)
+            result = await ERC721_mintRandomToken(instance, owner)
             event = result.logs[0].args
             let tokenId2 = event.tokenId
 
@@ -445,7 +445,7 @@ contract('ERC721 + metadata', (accounts) => {
     describe('safeTransferFrom', async () => {
         it("owner should be able to transfer its token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -456,7 +456,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("approved should be able to transfer a token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -469,7 +469,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("newOwner should be able to transfer the token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -483,7 +483,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("oldOwner should not be able to transfer the previously-owned token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -501,7 +501,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("should not be able to transfer to the zero address", async () => {
             try {
-                let result = await mintRandomToken(instance, owner)
+                let result = await ERC721_mintRandomToken(instance, owner)
                 const event = result.logs[0].args
                 let tokenId = event.tokenId
                 await instance.safeTransferFrom(owner, ZERO_ADDRESS, tokenId, {from: owner})
@@ -523,7 +523,7 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("notApprovedUser should not be able to transfer a token", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             const event = result.logs[0].args
             let tokenId = event.tokenId
 
@@ -538,11 +538,11 @@ contract('ERC721 + metadata', (accounts) => {
 
         it("approvedForAll user should be able to transfer all tokens of the approving user", async () => {
             //mint a token to test
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             let event = result.logs[0].args
             let tokenId1 = event.tokenId
 
-            result = await mintRandomToken(instance, owner, 1)
+            result = await ERC721_mintRandomToken(instance, owner, 1)
             event = result.logs[0].args
             let tokenId2 = event.tokenId
 
@@ -559,11 +559,11 @@ contract('ERC721 + metadata', (accounts) => {
         })
 
         it("revoking approvalForAll should work", async () => {
-            let result = await mintRandomToken(instance, owner)
+            let result = await ERC721_mintRandomToken(instance, owner)
             let event = result.logs[0].args
             let tokenId1 = event.tokenId
 
-            result = await mintRandomToken(instance, owner)
+            result = await ERC721_mintRandomToken(instance, owner)
             event = result.logs[0].args
             let tokenId2 = event.tokenId
 

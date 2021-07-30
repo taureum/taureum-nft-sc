@@ -1,5 +1,5 @@
 const {assert} = require("chai")
-const {pad} = require("./helper");
+const {pad} = require("../helper");
 
 const checkTransferEvent = async (transferEvent, tokenId, from, to) => {
     if (tokenId.substr(0, 2) === "0x") {

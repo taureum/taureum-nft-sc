@@ -1,7 +1,6 @@
 const {assert} = require('chai')
 const {contractName} = require("./helper/ERC721/load")
 const {randomRedeemData} = require("./helper/ERC721/lazy-minter")
-const {randomURI} = require("./helper/ERC721/helper")
 const {checkTransferEvent, checkApproveEvent} = require("./helper/ERC721/events")
 
 const {
@@ -16,9 +15,9 @@ const {
 
 const {
     ZERO_ADDRESS,
-    pad,
-    mintToken,
-} = require("./helper/ERC721/helper")
+    ERC721_mintToken,
+    randomURI,
+} = require("./helper/helper")
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -111,7 +110,7 @@ contract('ERC721 with LazyMint', (accounts) => {
         it('should fail to redeem an already-been-minted NFT', async () => {
             let lazyMintData = await randomRedeemData(address, minter)
 
-            await mintToken(instance, minter, lazyMintData.uri)
+            await ERC721_mintToken(instance, minter, lazyMintData.uri)
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
                 shouldNotPass()
