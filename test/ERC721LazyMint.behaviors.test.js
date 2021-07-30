@@ -7,8 +7,12 @@ const {checkTransferEvent, checkApproveEvent} = require("./helper/ERC721/events"
 const {
     ERC721_TOKEN_ALREADY_MINTED,
     ERC721_MUST_BE_OWNER_OR_APPROVED,
-    shouldErrorContainMessage, shouldNotPass,
 } = require("./helper/ERC721/errors")
+
+const {
+    shouldNotPass,
+    shouldErrorContainMessage,
+} = require("./helper/errors")
 
 const {
     ZERO_ADDRESS,

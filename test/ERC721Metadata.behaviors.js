@@ -1,20 +1,20 @@
-var crypto = require("crypto");
-const {assert, expect} = require('chai')
-const {contractName, web3} = require("./helper/ERC721/load")
+const {crypto} = require("crypto");
+const {assert} = require('chai')
+const {contractName} = require("./helper/ERC721/load")
 const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
-const {checkApproveEvent, checkTransferEvent, checkApprovalForAllEvent} = require("./helper/ERC721/events")
 
 const {
     NOT_CONTRACT_OWNER,
     ERC721_METADATA_URI_QUERY_FOR_NONEXISTENT_TOKEN,
-    shouldErrorContainMessage,
-    shouldNotPass,
 } = require("./helper/ERC721/errors")
 
 const {
-    ZERO_ADDRESS,
+    shouldNotPass,
+    shouldErrorContainMessage,
+} = require("./helper/errors")
+
+const {
     mintToken,
-    mintRandomToken,
 } = require("./helper/ERC721/helper")
 
 require('chai')
@@ -26,16 +26,6 @@ contract('ERC721Metadata', (accounts) => {
 
     let contractOwner = accounts[0]
     let notContractOwner = accounts[1]
-    let anotherOwner = accounts[1]
-    let newOwner = accounts[2]
-    let notOwner = accounts[3]
-    let approvedUser = accounts[4]
-    let anotherApprovedUser = accounts[5]
-    let notApprovedUser = accounts[6]
-    let operator = accounts[7]
-    let anotherOperator = accounts[8]
-
-    let baseURI = ""
 
     before(async () => {
         instance = await contractName.deployed()
@@ -95,7 +85,7 @@ contract('ERC721Metadata', (accounts) => {
         it('cannot query the URI for non-existing token', async function () {
             try {
                 let tokenId = crypto.randomBytes(32)
-                let result = await instance.tokenURI(tokenId)
+                await instance.tokenURI(tokenId)
                 shouldNotPass()
             } catch (e) {
                 shouldErrorContainMessage(e, ERC721_METADATA_URI_QUERY_FOR_NONEXISTENT_TOKEN)

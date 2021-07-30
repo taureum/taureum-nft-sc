@@ -14,10 +14,12 @@ const {
     ERC721_APPROVE_SELF,
     ERC721_NOT_OWNER_OR_APPROVED,
     ERC721_NOT_OWNER_OR_APPROVED_FOR_ALL,
-    REVERT_MESSAGE,
-    shouldErrorContainMessage,
-    shouldNotPass,
 } = require("./helper/ERC721/errors")
+
+const {
+    shouldNotPass,
+    shouldErrorContainMessage,
+} = require("./helper/errors")
 
 const {
     ZERO_ADDRESS,
