@@ -1,25 +1,25 @@
 const crypto = require('crypto')
 
-async function mintToken(contract, owner, uri, supply) {
+mintToken = async (contract, owner, uri, supply) => {
     if (owner === '0x0000000000000000000000000000000000000000') {
-        return await contract.mint(owner, uri)
+        return await contract.mint(owner, uri, supply, 0)
     }
-    return await contract.mint(owner, uri, supply, "", {from: owner})
+    let res =  await contract.mint(owner, uri, supply, 0, {from: owner})
+    return res
 }
 
-async function mintRandomToken(contract, owner, supply) {
+const mintRandomToken = async (contract, owner) => {
+    let supply = crypto.randomInt(10000000000000000000)
     let uri = crypto.randomBytes(32).toString('hex');
     if (owner === '0x0000000000000000000000000000000000000000') {
-        return await contract.mint(owner, uri)
+        return await contract.mint(owner, uri, supply, 0)
     }
-    return await contract.mint(owner, uri, supply, "", {from: owner})
+    return await contract.mint(owner, uri, supply, 0, {from: owner})
 }
 
-function randomURI() {
+const randomURI = () => {
     return crypto.randomBytes(32).toString('hex');
 }
-
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 const pad = (data, l) => {
     if (data.length < l) {
@@ -27,5 +27,7 @@ const pad = (data, l) => {
     }
     return data
 }
+
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 module.exports = {mintToken, mintRandomToken, randomURI, pad, ZERO_ADDRESS}
