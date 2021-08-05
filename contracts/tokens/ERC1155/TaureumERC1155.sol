@@ -13,23 +13,23 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
     mapping(uint256 => string) internal idToUri;
 
     /**
-     * @dev Create a new TaureumERC1155 contract.
+     * @dev Create a new TaureumERC1155 contract and set the `_uri` value.
      *
      */
     constructor(string memory uri_) ERC1155(uri_) Ownable() {
     }
 
     /**
-     * @dev Mint a new ERC1155 token.
+     * @dev Mint a new ERC1155 token. A token can only be minted once.
      */
     function mint(
         address to,
         string calldata uri,
         uint256 supply,
         bytes memory data
-    ) external virtual returns (uint256){
+    ) external returns (uint256){
         uint256 id = uint256(keccak256(abi.encode(to, uri)));
-        require(!exists(id), "ERC1155: token already minted");
+//        require(!exists(id), "ERC1155: token already minted");
 
         _mint(to, id, supply, data);
         _setTokenUri(id, uri);
