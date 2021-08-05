@@ -1,5 +1,5 @@
 var crypto = require("crypto");
-const {assert, expect} = require('chai')
+const {assert} = require('chai')
 const {contractName, web3} = require("./helper/ERC1155/load")
 
 const {ZERO_ADDRESS, ERC1155_mintToken, ERC1155_mintRandomToken} = require("./helper/helper")
@@ -91,6 +91,26 @@ contract('ERC1155', (accounts) => {
             let expectedTokenID = web3.utils.soliditySha3(packed)
 
             await mintShouldSucceed(instance, result, owner, expectedTokenID, supply, baseURI, uri)
+        })
+
+        it("should be able to re-mint a token", async () => {
+            let uri = crypto.randomBytes(32).toString('hex');
+            let supply = crypto.randomInt(1000000000000)
+            let result = await ERC1155_mintToken(instance, owner, uri, supply)
+            let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+                [owner, uri])
+            let expectedTokenID = web3.utils.soliditySha3(packed)
+
+            await mintShouldSucceed(instance, result, owner, expectedTokenID, supply, baseURI, uri)
+
+            let moreSupply = crypto.randomInt(1000000)
+            result = await ERC1155_mintToken(instance, owner, uri, moreSupply)
+            await checkTransferSingleEvent(result.logs[0].args, owner, ZERO_ADDRESS, owner, expectedTokenID.toString("hex"), moreSupply)
+
+            let tmpBalance = await instance.balanceOf(owner, expectedTokenID)
+            assert.equal(tmpBalance.toNumber(), supply+moreSupply, "balance not valid")
+            let tmpSupply = await instance.totalSupply(expectedTokenID)
+            assert.equal(tmpSupply.toNumber(), supply+moreSupply)
         })
 
         // it("cannot mint an already-been-minted token", async () => {
