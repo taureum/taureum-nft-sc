@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const {web3, TaureumERC721, walletAddress} = require("./utils/load");
+const {BigNumber} = require("ethers");
 
 (async () => {
     try {
