@@ -41,8 +41,7 @@ const ERC1155_mintToken = async (contract, owner, uri, supply) => {
     return res
 }
 
-const ERC1155_mintRandomToken = async (contract, owner) => {
-    let supply = crypto.randomInt(1000000000000)
+const ERC1155_mintRandomToken = async (contract, owner, supply = 10000000) => {
     let uri = crypto.randomBytes(32).toString('hex');
     if (owner === '0x0000000000000000000000000000000000000000') {
         return await contract.mint(owner, uri, supply, 0)

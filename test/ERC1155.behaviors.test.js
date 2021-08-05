@@ -7,8 +7,10 @@ const {checkTransferSingleEvent, checkApproveForAllEvent} = require("./helper/ER
 const {shouldNotPass, shouldErrorContainMessage} = require("./helper/errors");
 const {
     ERC1155_MINT_TO_ZERO_ADDRESS,
+    ERC1155_TRANSFER_TO_ZERO_ADDRESS,
     ERC1155_BALANCE_QUERY_FOR_ZERO_ADDRESS,
     ERC1155_SETTING_APPROVAL_FOR_SELF,
+    ERC1155_INSUFFICIENT_BALANCE,
 } = require("./helper/ERC1155/errors");
 
 require('chai')
@@ -28,23 +30,15 @@ const mintShouldSucceed = async (instance, result, minter, tokenId, totalSupply,
     assert.equal(tmpSupply, totalSupply)
 };
 
-const transferShouldSucceed = async (instance, result, from, to, tokenId) => {
-    await checkApproveEvent(result.logs[0].args, tokenId.toString("hex"), from, ZERO_ADDRESS)
-    await checkTransferEvent(result.logs[1].args, tokenId.toString("hex"), from, to)
+const transferShouldSucceed = async (instance, result, operator, from, to, tokenId, oldFromBalance, oldToBalance, amount) => {
+    await checkTransferSingleEvent(result.logs[0].args, operator, from, to, tokenId.toString("hex"), amount)
 
-    let owner = await instance.ownerOf(tokenId)
-    assert.equal(owner, to, "owner not valid")
+    let fromBalance = await instance.balanceOf(from, tokenId)
+    assert.equal(fromBalance.toNumber(), oldFromBalance - amount, "balance of `from` not valid")
 
-    let approved = await instance.getApproved(tokenId)
-    assert.equal(approved, ZERO_ADDRESS, "invalid approved")
+    let toBalance = await instance.balanceOf(to, tokenId)
+    assert.equal(toBalance.toNumber(), oldToBalance + amount, "balance of `to` not valid")
 };
-
-const approveShouldSucceed = async (instance, result, owner, spender, tokenId) => {
-    await checkApproveEvent(result.logs[0].args, tokenId.toString("hex"), owner, spender)
-
-    let approved = await instance.getApproved(tokenId)
-    assert.equal(approved, spender, "invalid approved")
-}
 
 const approveForAllShouldSucceed = async (instance, result, account, operator, approved) => {
     await checkApproveForAllEvent(result.logs[0].args, account, operator, approved)
@@ -57,14 +51,9 @@ contract('ERC1155', (accounts) => {
     let instance
 
     let owner = accounts[0]
-    let anotherOwner = accounts[1]
-    let newOwner = accounts[2]
-    let notOwner = accounts[3]
-    let approvedUser = accounts[4]
-    let anotherApprovedUser = accounts[5]
-    let notApprovedUser = accounts[6]
-    let operator = accounts[7]
-    let anotherOperator = accounts[8]
+    let newOwner = accounts[1]
+    let notOwner = accounts[2]
+    let operator = accounts[3]
 
     let baseURI = ""
 
@@ -189,4 +178,52 @@ contract('ERC1155', (accounts) => {
             }
         });
     })
+
+    describe('safeTransferFrom', function () {
+        it('should allow the owner to transfer his token', async () => {
+            let supply = crypto.randomInt(10000)
+            let res = await ERC1155_mintRandomToken(instance, owner, supply)
+            let tokenID = res.logs[0].args.id
+            let transferAmount = crypto.randomInt(supply)
+
+            let result = await instance.safeTransferFrom(owner, newOwner, tokenID, transferAmount, '0x', {from: owner})
+            await transferShouldSucceed(instance, result, owner, owner, newOwner, tokenID, supply, 0, transferAmount)
+        });
+
+        it('should allow an operator to transfer the token', async () => {
+            let supply = crypto.randomInt(10000)
+            let res = await ERC1155_mintRandomToken(instance, owner, supply)
+            let tokenID = res.logs[0].args.id
+            let transferAmount = crypto.randomInt(supply)
+
+            await instance.setApprovalForAll(operator, true,{from : owner})
+
+            let result = await instance.safeTransferFrom(owner, newOwner, tokenID, transferAmount, '0x', {from: operator})
+            await transferShouldSucceed(instance, result, operator, owner, newOwner, tokenID, supply, 0, transferAmount)
+        });
+
+        it('should revert when transferring more than balance', async () => {
+            let supply = crypto.randomInt(10000)
+            let res = await ERC1155_mintRandomToken(instance, owner, supply)
+            let tokenID = res.logs[0].args.id
+            
+            try {
+                await instance.safeTransferFrom(owner, newOwner, tokenID, supply + 1, '0x')
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC1155_INSUFFICIENT_BALANCE)
+            }
+        });
+
+        it('should revert when transferring to the zero address', async () => {
+            let supply = crypto.randomInt(10000)
+            let res = await ERC1155_mintRandomToken(instance, owner, supply)
+            let tokenID = res.logs[0].args.id
+
+            try {
+                await instance.safeTransferFrom(owner, ZERO_ADDRESS, tokenID, 1, '0x')
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC1155_TRANSFER_TO_ZERO_ADDRESS)
+            }
+        });
+    });
 })
