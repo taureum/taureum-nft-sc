@@ -29,7 +29,6 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
         bytes memory data
     ) external returns (uint256){
         uint256 id = uint256(keccak256(abi.encode(to, uri)));
-//        require(!exists(id), "ERC1155: token already minted");
 
         _mint(to, id, supply, data);
         _setTokenUri(id, uri);
