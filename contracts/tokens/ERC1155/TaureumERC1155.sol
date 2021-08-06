@@ -37,24 +37,29 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
         return id;
     }
 
-//    /**
-//     * @dev Mint a batch of tokens.
-//     */
-//    function mintBatch(
-//        address to,
-//        string[] memory uriList,
-//        uint256[] memory supplies,
-//        bytes memory data
-//    ) internal virtual override {
-//        require(uriList.length == supplies.length, "ERC1155: mintBatch lengths mismatch");
-//
-//        uint256[] ids = new uint256[](0);
-//        for (uint256 i = 0; i < uriList.length; ++i) {
-//            uint256 id = uint256(keccak256(abi.encode(to, uriList[i])));
-//            require(!exists(id), "ERC1155: token already minted");
-//            ids.push(id);
-//        }
-//    }
+    /**
+     * @dev Mint a batch of tokens.
+     */
+    function mintBatch(
+        address to,
+        string[] calldata uriList,
+        uint256[] calldata supplies,
+        bytes memory data
+    ) external returns (uint256[] memory) {
+        require(uriList.length == supplies.length, "ERC1155: mintBatch lengths mismatch");
+
+        uint256[] memory ids = new uint256[](uriList.length);
+        for (uint256 i = 0; i < uriList.length; ++i) {
+            ids[i] = uint256(keccak256(abi.encode(to, uriList[i])));
+        }
+
+        _mintBatch(to, ids, supplies, data);
+        for (uint256 i = 0; i < uriList.length; ++i) {
+            _setTokenUri(ids[i], uriList[i]);
+        }
+
+        return ids;
+    }
 
     /**
      * @dev Sets a new URI for all token types, by relying on the token type ID
