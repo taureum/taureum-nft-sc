@@ -2,8 +2,15 @@ var crypto = require("crypto");
 const {assert} = require('chai')
 const {contractName, web3} = require("./helper/ERC1155/load")
 
-const {ZERO_ADDRESS, ERC1155_mintToken, ERC1155_mintRandomToken} = require("./helper/helper")
-const {checkTransferSingleEvent, checkApproveForAllEvent} = require("./helper/ERC1155/events");
+const {
+    ZERO_ADDRESS,
+    ERC1155_mintToken,
+    ERC1155_mintRandomToken,
+    ERC1155_mintBatchToken,
+    ERC1155_mintRandomBatchToken, randomURI,
+} = require("./helper/helper")
+
+const {checkTransferSingleEvent, checkTransferBatchEvent, checkApproveForAllEvent} = require("./helper/ERC1155/events");
 const {shouldNotPass, shouldErrorContainMessage} = require("./helper/errors");
 const {
     ERC1155_MINT_TO_ZERO_ADDRESS,
@@ -12,6 +19,7 @@ const {
     ERC1155_SETTING_APPROVAL_FOR_SELF,
     ERC1155_INSUFFICIENT_BALANCE,
 } = require("./helper/ERC1155/errors");
+const {BigNumber} = require("ethers");
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -28,6 +36,24 @@ const mintShouldSucceed = async (instance, result, minter, tokenId, totalSupply,
 
     let tmpSupply = await instance.totalSupply(tokenId)
     assert.equal(tmpSupply, totalSupply)
+};
+
+const mintBatchShouldSucceed = async (instance, result, minter, tokenIds, totalSupplies, baseURI, uris, checkBalance = true) => {
+    await checkTransferBatchEvent(result.logs[0].args, minter, ZERO_ADDRESS, minter, tokenIds, totalSupplies)
+
+    if (checkBalance) {
+        for (let i = 0; i < tokenIds.length; i++) {
+            let tokenId = BigNumber.from("0x" + tokenIds[i])
+            let tmpBalance = await instance.balanceOf(minter, tokenId)
+            assert.equal(tmpBalance.toString(), totalSupplies[i], "balance not valid")
+
+            let tmpURI = await instance.tokenURI(tokenId)
+            assert.equal(tmpURI, `${baseURI}${uris[i]}`, "URI not valid")
+
+            let tmpSupply = await instance.totalSupply(tokenId)
+            assert.equal(tmpSupply, totalSupplies[i])
+        }
+    }
 };
 
 const transferShouldSucceed = async (instance, result, operator, from, to, tokenId, oldFromBalance, oldToBalance, amount) => {
@@ -51,9 +77,10 @@ contract('ERC1155', (accounts) => {
     let instance
 
     let owner = accounts[0]
-    let newOwner = accounts[1]
-    let notOwner = accounts[2]
-    let operator = accounts[3]
+    let anotherOwner = accounts[1]
+    let newOwner = accounts[2]
+    let notOwner = accounts[3]
+    let operator = accounts[4]
 
     let baseURI = ""
 
@@ -73,7 +100,7 @@ contract('ERC1155', (accounts) => {
 
     describe('minting', async () => {
         it("create a simple NFT", async () => {
-            let uri = crypto.randomBytes(32).toString('hex');
+            let uri = randomURI()
             const result = await ERC1155_mintToken(instance, owner, uri, 1)
             let packed = web3.eth.abi.encodeParameters(['address', 'string'],
                 [owner, uri])
@@ -83,7 +110,7 @@ contract('ERC1155', (accounts) => {
         })
 
         it("should be able to create a token with supply > 1", async () => {
-            let uri = crypto.randomBytes(32).toString('hex');
+            let uri = randomURI()
             let supply = crypto.randomInt(1000000000000)
             const result = await ERC1155_mintToken(instance, owner, uri, supply)
             let packed = web3.eth.abi.encodeParameters(['address', 'string'],
@@ -94,7 +121,7 @@ contract('ERC1155', (accounts) => {
         })
 
         it("should be able to re-mint a token", async () => {
-            let uri = crypto.randomBytes(32).toString('hex');
+            let uri = randomURI()
             let supply = crypto.randomInt(1000000000000)
             let result = await ERC1155_mintToken(instance, owner, uri, supply)
             let packed = web3.eth.abi.encodeParameters(['address', 'string'],
@@ -108,28 +135,10 @@ contract('ERC1155', (accounts) => {
             await checkTransferSingleEvent(result.logs[0].args, owner, ZERO_ADDRESS, owner, expectedTokenID.toString("hex"), moreSupply)
 
             let tmpBalance = await instance.balanceOf(owner, expectedTokenID)
-            assert.equal(tmpBalance.toNumber(), supply+moreSupply, "balance not valid")
+            assert.equal(tmpBalance.toNumber(), supply + moreSupply, "balance not valid")
             let tmpSupply = await instance.totalSupply(expectedTokenID)
-            assert.equal(tmpSupply.toNumber(), supply+moreSupply)
+            assert.equal(tmpSupply.toNumber(), supply + moreSupply)
         })
-
-        // it("cannot mint an already-been-minted token", async () => {
-        //     let uri = crypto.randomBytes(32).toString('hex');
-        //     let supply = crypto.randomInt(1000000000000)
-        //     const result = await ERC1155_mintToken(instance, owner, uri, supply)
-        //     let packed = web3.eth.abi.encodeParameters(['address', 'string'],
-        //         [owner, uri])
-        //     let expectedTokenID = web3.utils.soliditySha3(packed)
-        //     await mintShouldSucceed(instance, result, owner, expectedTokenID, supply, baseURI, uri)
-        //
-        //     try {
-        //         await ERC1155_mintToken(instance, owner, uri, crypto.randomInt(1000000000))
-        //         shouldNotPass()
-        //     } catch (e) {
-        //         shouldErrorContainMessage(e, ERC1155_TOKEN_EXISTED)
-        //     }
-        //
-        // })
 
         it("cannot mint to the zero address", async () => {
             try {
@@ -142,8 +151,66 @@ contract('ERC1155', (accounts) => {
         })
     })
 
+    describe('batch Minting', async () => {
+        it("should be able to create a batch of tokens", async () => {
+            let r = 1 + crypto.randomInt(10)
+            let uris = new Array(r)
+            let expectedIDs = new Array(r)
+            let supplies = new Array(r)
+            for (let i = 0; i < r; i++) {
+                uris[i] = randomURI()
+                supplies[i] = crypto.randomInt(1000000000000)
+                let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+                    [owner, uris[i]])
+                expectedIDs[i] = web3.utils.soliditySha3(packed)
+            }
+            const result = await ERC1155_mintBatchToken(instance, owner, uris, supplies)
+
+            await mintBatchShouldSucceed(instance, result, owner, expectedIDs, supplies, baseURI, uris)
+        })
+
+        it("cannot mint to the zero address", async () => {
+            try {
+                await ERC1155_mintRandomBatchToken(instance, ZERO_ADDRESS)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC1155_MINT_TO_ZERO_ADDRESS)
+            }
+        })
+
+        it("should be able to mint duplicate tokens", async () => {
+            let uris = new Array(2)
+            let expectedIDs = new Array(2)
+            let supplies = new Array(2)
+
+            uris[0] = randomURI()
+            uris[1] = uris[0]
+
+            let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+                [owner, uris[0]])
+            expectedIDs[0] = web3.utils.soliditySha3(packed)
+            expectedIDs[1] = expectedIDs[0]
+
+            supplies[0] = crypto.randomInt(1000000000000)
+            supplies[1] = crypto.randomInt(1000000000000)
+
+            const result = await ERC1155_mintBatchToken(instance, owner, uris, supplies)
+            await mintBatchShouldSucceed(instance, result, owner, expectedIDs, supplies, baseURI, uris, false)
+
+            let tokenId = BigNumber.from("0x" + expectedIDs[0])
+            let tmpBalance = await instance.balanceOf(owner, tokenId)
+            assert.equal(tmpBalance.toString(), supplies[0] + supplies[1], "balance not valid")
+
+            let tmpURI = await instance.tokenURI(tokenId)
+            assert.equal(tmpURI, `${baseURI}${uris[1]}`, "URI not valid")
+
+            let tmpSupply = await instance.totalSupply(tokenId)
+            assert.equal(tmpSupply, supplies[0] + supplies[1])
+        })
+    })
+
     describe('balanceOf', async () => {
-        it("should revert when queried about the balance of the zero address", async () => {
+        it("should revert when queried about the balance of the zero address.", async () => {
             try {
                 let res = await ERC1155_mintRandomToken(instance, owner)
                 let tokenID = res.logs[0].args.id
@@ -174,6 +241,49 @@ contract('ERC1155', (accounts) => {
 
             let balance = await instance.balanceOf(owner, expectedTokenID)
             assert.equal(balance.toNumber(), numTokens, "invalid balance")
+        })
+    })
+
+    describe('balanceOfBatch', async () => {
+        it("should revert when queried about the balance of the zero address.", async () => {
+            try {
+                let res = await ERC1155_mintRandomToken(instance, owner)
+                let tokenID = res.logs[0].args.id
+
+                let tmpAccounts = new Array(2)
+                let tmpIDs = new Array(2)
+
+                tmpAccounts[0] = owner
+                tmpAccounts[1] = ZERO_ADDRESS
+                tmpIDs[0] = tokenID
+                tmpIDs[1] = tokenID
+
+                await instance.balanceOfBatch(tmpAccounts, tmpIDs)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC1155_BALANCE_QUERY_FOR_ZERO_ADDRESS)
+            }
+        })
+
+        it("should return the correct amount.", async () => {
+            let res = await ERC1155_mintRandomToken(instance, owner)
+            let tokenID1 = res.logs[0].args.id
+            let supply1 = res.logs[0].args.value
+            res = await ERC1155_mintRandomToken(instance, anotherOwner)
+            let tokenID2 = res.logs[0].args.id
+            let supply2 = res.logs[0].args.value
+
+            let tmpAccounts = new Array(2)
+            let tmpIDs = new Array(2)
+
+            tmpAccounts[0] = owner
+            tmpAccounts[1] = anotherOwner
+            tmpIDs[0] = tokenID1
+            tmpIDs[1] = tokenID2
+
+            let balances = await instance.balanceOfBatch(tmpAccounts, tmpIDs)
+            assert.equal(balances[0].toNumber(), supply1.toNumber(), "invalid balance")
+            assert.equal(balances[1].toNumber(), supply2.toNumber(), "invalid balance")
         })
     })
 
@@ -216,7 +326,7 @@ contract('ERC1155', (accounts) => {
             let tokenID = res.logs[0].args.id
             let transferAmount = crypto.randomInt(supply)
 
-            await instance.setApprovalForAll(operator, true,{from : owner})
+            await instance.setApprovalForAll(operator, true, {from: owner})
 
             let result = await instance.safeTransferFrom(owner, newOwner, tokenID, transferAmount, '0x', {from: operator})
             await transferShouldSucceed(instance, result, operator, owner, newOwner, tokenID, supply, 0, transferAmount)
@@ -226,7 +336,7 @@ contract('ERC1155', (accounts) => {
             let supply = crypto.randomInt(10000)
             let res = await ERC1155_mintRandomToken(instance, owner, supply)
             let tokenID = res.logs[0].args.id
-            
+
             try {
                 await instance.safeTransferFrom(owner, newOwner, tokenID, supply + 1, '0x')
             } catch (e) {
