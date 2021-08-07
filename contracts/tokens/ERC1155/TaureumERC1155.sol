@@ -6,17 +6,36 @@ import "../../lib/token/ERC1155/ERC1155.sol";
 import "../../lib/token/ERC1155/extensions/ERC1155Supply.sol";
 import "../../lib/access/Ownable.sol";
 
-contract TaureumERC1155 is ERC1155Supply, Ownable {
+contract TaureumERC1155 is ERC1155, Ownable {
+    /**
+     * @dev Mapping from token IDs to their total supplies.
+     */
+    mapping(uint256 => uint256) internal _totalSupply;
+
     /**
      * @dev Mapping from NFT ID to metadata uri.
      */
-    mapping(uint256 => string) internal idToUri;
+    mapping(uint256 => string) internal _idToUri;
 
     /**
      * @dev Create a new TaureumERC1155 contract and set the `_uri` value.
      *
      */
-    constructor(string memory uri_) ERC1155(uri_) Ownable() {
+    constructor(string memory baseURI_) ERC1155(baseURI_) Ownable() {
+    }
+
+    /**
+     * @dev Total amount of tokens in with a given id.
+     */
+    function totalSupply(uint256 id) public view virtual returns (uint256) {
+        return _totalSupply[id];
+    }
+
+    /**
+     * @dev Return the indicator whether a token exists given its id.
+     */
+    function exists(uint256 _id) public view virtual returns (bool) {
+        return _totalSupply[_id] > 0;
     }
 
     /**
@@ -27,7 +46,7 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
         string calldata uri,
         uint256 supply,
         bytes memory data
-    ) external returns (uint256){
+    ) external virtual returns (uint256){
         uint256 id = uint256(keccak256(abi.encode(to, uri)));
 
         _mint(to, id, supply, data);
@@ -44,7 +63,7 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
         string[] calldata uriList,
         uint256[] calldata supplies,
         bytes memory data
-    ) external returns (uint256[] memory) {
+    ) external virtual returns (uint256[] memory) {
         require(uriList.length == supplies.length, "ERC1155: mintBatch lengths mismatch");
 
         uint256[] memory ids = new uint256[](uriList.length);
@@ -79,7 +98,7 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
      * Because these URIs cannot be meaningfully represented by the {URI} event,
      * this function emits no events.
      */
-    function setURI(string memory newURI) external onlyOwner {
+    function setURI(string memory newURI) public onlyOwner {
         _setURI(newURI);
     }
 
@@ -91,7 +110,7 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
 
         string memory baseURI = uri(tokenId);
 
-        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, idToUri[tokenId])) : idToUri[tokenId];
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _idToUri[tokenId])) : _idToUri[tokenId];
     }
 
     /**
@@ -109,7 +128,61 @@ contract TaureumERC1155 is ERC1155Supply, Ownable {
     internal
     {
         require(exists(tokenId_), "ERC1155: URI query for nonexistent token");
-        idToUri[tokenId_] = uri_;
+        _idToUri[tokenId_] = uri_;
+    }
+
+    /**
+     * @dev See {ERC1155-_mint}.
+     */
+    function _mint(
+        address account,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) internal virtual override {
+        super._mint(account, id, amount, data);
+        _totalSupply[id] += amount;
+    }
+
+    /**
+     * @dev See {ERC1155-_mintBatch}.
+     */
+    function _mintBatch(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        super._mintBatch(to, ids, amounts, data);
+        for (uint256 i = 0; i < ids.length; ++i) {
+            _totalSupply[ids[i]] += amounts[i];
+        }
+    }
+
+    /**
+     * @dev See {ERC1155-_burn}.
+     */
+    function _burn(
+        address account,
+        uint256 id,
+        uint256 amount
+    ) internal virtual override {
+        super._burn(account, id, amount);
+        _totalSupply[id] -= amount;
+    }
+
+    /**
+     * @dev See {ERC1155-_burnBatch}.
+     */
+    function _burnBatch(
+        address account,
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) internal virtual override {
+        super._burnBatch(account, ids, amounts);
+        for (uint256 i = 0; i < ids.length; ++i) {
+            _totalSupply[ids[i]] -= amounts[i];
+        }
     }
 
 }
