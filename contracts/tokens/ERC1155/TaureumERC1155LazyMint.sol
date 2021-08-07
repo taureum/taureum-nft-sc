@@ -12,7 +12,9 @@ contract TaureumERC1155LazyMint is TaureumERC1155, EIP712 {
     /**
      * @dev Mapping for checking if minting data has been redeemed.
      */
-    mapping(bytes32 => bool) private _mintHashUsed;
+    mapping(bytes32 => bool) private _mintHashRedeemed;
+
+    event Logs(address creator, bytes32 digest, bytes signature, bytes32 salt);
 
     /**
      * @dev A struct consists of the lazy minting data.
@@ -36,17 +38,18 @@ contract TaureumERC1155LazyMint is TaureumERC1155, EIP712 {
      * This function should be handled by a smart contract which is allowed by the `creator`.
      * @notice For each lazy minting data, this function should only be called once.
      * @notice It throws if
+     *      - the minting data has already been redeemed.
      *      - `msg.sender` is not the `creator` or has not been approved by the `creator`.
      *      - minting data and signature are not valid.
      *      - if the `redeemer` is a contract and it cannot receive the NFT.
-     * @param mintData The lazy minting data.
      * @param redeemer The address of the party that an amount of the minting token will be transferred to.
+     * @param mintData The lazy minting data.
      */
-    function redeem(MintData calldata mintData, address redeemer)
+    function redeem(address redeemer, MintData calldata mintData)
     public virtual returns (uint256)
     {
         bytes32 digest = _hash(mintData);
-        require(!_mintHashUsed[digest], "ERC1155: mint data redeemed");
+        require(!_mintHashRedeemed[digest], "ERC1155: mint data already redeemed");
 
         address creator = _verify(digest, mintData.signature);
         address operator = msg.sender;
@@ -61,7 +64,12 @@ contract TaureumERC1155LazyMint is TaureumERC1155, EIP712 {
         _setTokenUri(id, mintData.tokenURI);
 
         // save the creator
-        _saveCreator(id, creator);
+        if (_creator[id] == address(0x0)) {
+            _saveCreator(id, creator);
+        }
+
+        // set the redeemed status
+        _mintHashRedeemed[digest] = true;
 
         // transfer the token to the redeemer
         safeTransferFrom(creator, redeemer, id, mintData.amount, "");
@@ -74,7 +82,7 @@ contract TaureumERC1155LazyMint is TaureumERC1155, EIP712 {
     internal view returns (bytes32)
     {
         return _hashTypedDataV4(keccak256(abi.encode(
-                keccak256("TaureumERC1155(string uri,uint256 supply,uint256 salt)"),
+                keccak256("TaureumERC1155(string uri,uint256 amount,uint256 salt)"),
                 keccak256(bytes(mintData.tokenURI)),
                 mintData.amount,
                 mintData.salt

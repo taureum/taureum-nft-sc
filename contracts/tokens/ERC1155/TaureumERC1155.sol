@@ -10,7 +10,7 @@ contract TaureumERC1155 is ERC1155, Ownable {
     /**
      * @dev Mapping from token IDs to their creator.
      */
-    mapping(uint256 => address) private _creator;
+    mapping(uint256 => address) internal _creator;
 
     /**
      * @dev Mapping from token IDs to their total supplies.
@@ -65,14 +65,14 @@ contract TaureumERC1155 is ERC1155, Ownable {
      */
     function mint(
         address to,
-        string calldata uri,
+        string calldata uri_,
         uint256 amount,
         bytes memory data
     ) external virtual returns (uint256){
-        uint256 id = uint256(keccak256(abi.encode(to, uri)));
+        uint256 id = uint256(keccak256(abi.encode(to, uri_)));
 
         _mint(to, id, amount, data);
-        _setTokenUri(id, uri);
+        _setTokenUri(id, uri_);
 
         // save the creator (if needed)
         if (_creator[id] == address(0x0)) {
@@ -137,10 +137,10 @@ contract TaureumERC1155 is ERC1155, Ownable {
     /**
      * @dev Return the URI of a tokenId.
      */
-    function tokenURI(uint256 tokenId) public view virtual returns (string memory) {
+    function uri(uint256 tokenId) public view virtual override returns (string memory) {
         require(exists(tokenId), "ERC1155: URI query for nonexistent token");
 
-        string memory baseURI = uri(tokenId);
+        string memory baseURI = super.uri(tokenId);
 
         return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, _idToUri[tokenId])) : _idToUri[tokenId];
     }
