@@ -1,14 +1,14 @@
-const {TaureumERC721, TaureumERC721Address} = require("./utils/load");
-const {sellerWalletAddress, buyerWalletAddress} = require("./utils/load-keys");
-const {LazyMinter} = require("./utils/lazy-minter");
-const {randomURI} = require("./utils/helper");
+const {TaureumERC721, TaureumERC721Address} = require("../utils/load");
+const {sellerWalletAddress, buyerWalletAddress} = require("../utils/load-keys");
+const {ERC721_LazyMinter} = require("./utils/lazy-minter");
+const {randomURI} = require("./utils/utils");
 
 (async () => {
     try {
         let minter = sellerWalletAddress
         let redeemer = buyerWalletAddress
 
-        let lm = new LazyMinter({contractAddress: TaureumERC721Address, signer: minter})
+        let lm = new ERC721_LazyMinter({contractAddress: TaureumERC721Address, signer: minter})
         let uri = randomURI()
         let lazyData = await lm.createLazyMintingData(uri)
         console.log("sig", lazyData.signature)

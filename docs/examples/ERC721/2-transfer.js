@@ -1,5 +1,5 @@
 const {mintRandomNFT} = require("./utils/utils");
-const {TaureumERC721, walletAddress} = require("./utils/load");
+const {TaureumERC721, walletAddress} = require("../utils/load");
 
 (async () => {
     try {

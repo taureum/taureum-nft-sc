@@ -1,8 +1,12 @@
 const crypto = require("crypto");
-const {TaureumERC721} = require('./load')
+const {TaureumERC721} = require('../../utils/load')
+
+function randomURI() {
+    return crypto.randomBytes(32).toString('hex');
+}
 
 const mintRandomNFT = async(address) => {
-    let uri = crypto.randomBytes(20).toString('hex');
+    let uri = randomURI()
     let gasEstimate = await TaureumERC721.methods.mint(
         address, uri
     ).estimateGas({ from: address });
@@ -17,4 +21,4 @@ const mintRandomNFT = async(address) => {
     return res.events.Transfer.returnValues.tokenId
 }
 
-module.exports = {mintRandomNFT}
+module.exports = {mintRandomNFT, randomURI}

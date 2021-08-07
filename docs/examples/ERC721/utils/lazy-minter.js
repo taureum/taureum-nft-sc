@@ -1,6 +1,6 @@
-const {web3} = require("./load")
+const {web3} = require("../../utils/load")
 
-class LazyMinter {
+class ERC721_LazyMinter {
     constructor({contractAddress, signer}) {
         this.contractAddress = contractAddress
         this.signer = signer
@@ -51,5 +51,5 @@ class LazyMinter {
 }
 
 module.exports = {
-    LazyMinter
+    ERC721_LazyMinter
 }
