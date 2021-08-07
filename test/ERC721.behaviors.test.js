@@ -1,7 +1,7 @@
 var crypto = require("crypto");
 const {assert} = require('chai')
 const {contractName, web3} = require("./helper/ERC721/load")
-const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
+const {shouldSupportInterfaces} = require("./helper/SupportsInterface.behaviors")
 const {checkApproveEvent, checkTransferEvent, checkApprovalForAllEvent} = require("./helper/ERC721/events")
 
 const {

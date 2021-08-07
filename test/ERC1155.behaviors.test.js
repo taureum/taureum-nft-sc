@@ -9,7 +9,7 @@ const {
     ERC1155_mintBatchToken,
     ERC1155_mintRandomBatchToken, randomURI,
 } = require("./helper/helper")
-
+const {shouldSupportInterfaces} = require("./helper/SupportsInterface.behaviors");
 const {checkTransferSingleEvent, checkTransferBatchEvent, checkApproveForAllEvent} = require("./helper/ERC1155/events");
 const {shouldNotPass, shouldErrorContainMessage} = require("./helper/errors");
 const {
@@ -36,6 +36,9 @@ const mintShouldSucceed = async (instance, result, minter, tokenId, totalSupply,
 
     let tmpSupply = await instance.totalSupply(tokenId)
     assert.equal(tmpSupply, totalSupply)
+
+    let tmpCreator = await instance.getCreator(tokenId)
+    assert.equal(tmpCreator, minter)
 };
 
 const mintBatchShouldSucceed = async (instance, result, minter, tokenIds, totalSupplies, baseURI, uris, checkBalance = true) => {
@@ -86,6 +89,12 @@ contract('ERC1155', (accounts) => {
 
     before(async () => {
         instance = await contractName.deployed()
+    })
+
+    describe("supportInterfaces", async () => {
+        await shouldSupportInterfaces(contractName, [
+            'ERC1155',
+        ]);
     })
 
     describe('deployment', async () => {

@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const {assert} = require('chai')
 const {contractName} = require("./helper/ERC721/load")
-const {shouldSupportInterfaces} = require("./helper/ERC721/SupportsInterface.behaviors")
+const {shouldSupportInterfaces} = require("./helper/SupportsInterface.behaviors")
 
 const {
     NOT_CONTRACT_OWNER,
