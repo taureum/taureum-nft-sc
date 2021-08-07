@@ -1,12 +1,11 @@
-const Web3 = require("web3")
 const {randomURI} = require("../helper")
 const {web3} = require("./load")
 
-class ERC721LazyMinter {
+class ERC1155LazyMinter {
     constructor({contractAddress, signer}) {
         this.contractAddress = contractAddress
         this.signer = signer
-        this.hashedName = web3.utils.soliditySha3({type: "string", value: "TaureumNFT"})
+        this.hashedName = web3.utils.soliditySha3({type: "string", value: "TaureumERC1155"})
         this.hashedVersion = web3.utils.soliditySha3({type: "string", value: "1"})
         this.typeHash = web3.utils.soliditySha3("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)")
     }
@@ -27,26 +26,34 @@ class ERC721LazyMinter {
         )
     }
 
-    async _getStructHash(uri) {
+    async _getStructHash(uri, amount, salt) {
         let packed = web3.eth.abi.encodeParameters(
-            ["bytes32", "bytes32"],
-            [web3.utils.soliditySha3("TaureumNFT(string uri)"), web3.utils.soliditySha3(uri)]
+        ["bytes32", "bytes32", "uint256", "uint256"],
+        [
+            web3.utils.soliditySha3("TaureumERC1155(string uri,uint256 amount,uint256 salt)"),
+            web3.utils.soliditySha3(uri),
+            amount,
+            salt,
+        ],
         )
         return web3.utils.soliditySha3(packed)
     }
 
-    async createLazyMintingData(uri) {
+    async createLazyMintingData(uri, amount) {
         let expectedTokenId = web3.utils.soliditySha3(web3.eth.abi.encodeParameters(['address', 'string'],
             [this.signer, uri]))
+        let salt = crypto.randomBytes(32)
 
-        const structHash = await this._getStructHash(uri)
+        const structHash = await this._getStructHash(uri, amount, salt)
         const typedDataHash = await this._toTypedDataHash(structHash)
 
         let signature = await web3.eth.sign(typedDataHash, this.signer)
         let v = parseInt(signature.substr(130), 16) + 27
         signature = signature.substr(0, 130).concat(v.toString(16))
+
+        let mintData = {tokenURI: uri, amount: amount, salt: salt, signature: signature}
         return {
-            uri,
+            mintData,
             expectedTokenId,
             signature,
             typedDataHash,
@@ -54,14 +61,22 @@ class ERC721LazyMinter {
     }
 }
 
-const ERC721_randomRedeemData = async (contractAddress, signer) => {
-    let lm = new ERC721LazyMinter({contractAddress: contractAddress, signer: signer});
-    let uri = randomURI()
+const ERC1155_newRedeemData = async (contractAddress, signer, uri, amount) => {
+    let lm = new ERC1155LazyMinter({contractAddress: contractAddress, signer: signer});
 
-    return await lm.createLazyMintingData(uri)
+    return await lm.createLazyMintingData(uri, amount)
+}
+
+const ERC1155_randomRedeemData = async (contractAddress, signer) => {
+    let lm = new ERC1155LazyMinter({contractAddress: contractAddress, signer: signer});
+    let uri = randomURI()
+    let amount = crypto.randomInt(1000)
+
+    return await lm.createLazyMintingData(uri, amount)
 }
 
 module.exports = {
-    ERC721LazyMinter,
-    ERC721_randomRedeemData
+    ERC1155LazyMinter,
+    ERC1155_newRedeemData,
+    ERC1155_randomRedeemData
 }

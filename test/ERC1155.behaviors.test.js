@@ -31,7 +31,7 @@ const mintShouldSucceed = async (instance, result, minter, tokenId, totalSupply,
     let tmpBalance = await instance.balanceOf(minter, tokenId)
     assert.equal(tmpBalance.toString(), totalSupply, "balance not valid")
 
-    let tmpURI = await instance.tokenURI(tokenId)
+    let tmpURI = await instance.uri(tokenId)
     assert.equal(tmpURI, `${baseURI}${uri}`, "URI not valid")
 
     let tmpSupply = await instance.totalSupply(tokenId)
@@ -50,7 +50,7 @@ const mintBatchShouldSucceed = async (instance, result, minter, tokenIds, totalS
             let tmpBalance = await instance.balanceOf(minter, tokenId)
             assert.equal(tmpBalance.toString(), totalSupplies[i], "balance not valid")
 
-            let tmpURI = await instance.tokenURI(tokenId)
+            let tmpURI = await instance.uri(tokenId)
             assert.equal(tmpURI, `${baseURI}${uris[i]}`, "URI not valid")
 
             let tmpSupply = await instance.totalSupply(tokenId)
@@ -94,6 +94,7 @@ contract('ERC1155', (accounts) => {
     describe("supportInterfaces", async () => {
         await shouldSupportInterfaces(contractName, [
             'ERC1155',
+            'ERC1155MetadataURI',
         ]);
     })
 
@@ -210,7 +211,7 @@ contract('ERC1155', (accounts) => {
             let tmpBalance = await instance.balanceOf(owner, tokenId)
             assert.equal(tmpBalance.toString(), supplies[0] + supplies[1], "balance not valid")
 
-            let tmpURI = await instance.tokenURI(tokenId)
+            let tmpURI = await instance.uri(tokenId)
             assert.equal(tmpURI, `${baseURI}${uris[1]}`, "URI not valid")
 
             let tmpSupply = await instance.totalSupply(tokenId)

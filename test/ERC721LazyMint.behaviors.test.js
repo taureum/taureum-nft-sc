@@ -1,6 +1,6 @@
 const {assert} = require('chai')
 const {contractName} = require("./helper/ERC721/load")
-const {randomRedeemData} = require("./helper/ERC721/lazy-minter")
+const {ERC721_randomRedeemData} = require("./helper/ERC721/lazy-minter")
 const {checkTransferEvent, checkApproveEvent} = require("./helper/ERC721/events")
 
 const {
@@ -57,21 +57,21 @@ contract('ERC721 with LazyMint', (accounts) => {
 
     describe('redeem', async () => {
         it('should redeem an NFT from a valid signature (sent by owner)', async () => {
-            let lazyMintData = await randomRedeemData(address, minter)
+            let lazyMintData = await ERC721_randomRedeemData(address, minter)
 
             let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
             await redeemShouldSucceed(instance, result, lazyMintData, minter, redeemer)
         })
 
         it('should redeem an NFT from a valid signature (sent by approved)', async () => {
-            let lazyMintData = await randomRedeemData(address, minter)
+            let lazyMintData = await ERC721_randomRedeemData(address, minter)
 
             let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: approved})
             await redeemShouldSucceed(instance, result, lazyMintData, minter, redeemer)
         })
 
         it('should fail to redeem an NFT from a valid signature but sent by notApproved', async () => {
-            let lazyMintData = await randomRedeemData(address, minter)
+            let lazyMintData = await ERC721_randomRedeemData(address, minter)
 
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: notApproved})
@@ -82,7 +82,7 @@ contract('ERC721 with LazyMint', (accounts) => {
         })
 
         it('should fail to redeem an already-been-redeemed NFT', async () => {
-            let lazyMintData = await randomRedeemData(address, minter)
+            let lazyMintData = await ERC721_randomRedeemData(address, minter)
 
             let result = await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
             await redeemShouldSucceed(instance, result, lazyMintData, minter, redeemer)
@@ -95,7 +95,7 @@ contract('ERC721 with LazyMint', (accounts) => {
         })
 
         it('should fail to redeem an already-been-minted NFT', async () => {
-            let lazyMintData = await randomRedeemData(address, minter)
+            let lazyMintData = await ERC721_randomRedeemData(address, minter)
 
             await ERC721_mintToken(instance, minter, lazyMintData.uri)
             try {
@@ -107,7 +107,7 @@ contract('ERC721 with LazyMint', (accounts) => {
         })
 
         it('should fail to redeem an NFT with modified URI', async () => {
-            let lazyMintData = await randomRedeemData(address, minter)
+            let lazyMintData = await ERC721_randomRedeemData(address, minter)
             lazyMintData.uri = randomURI()
             try {
                 await instance.redeem(redeemer, lazyMintData.uri, lazyMintData.signature, {from: minter})
