@@ -8,6 +8,11 @@ import "../../lib/access/Ownable.sol";
 
 contract TaureumERC1155 is ERC1155, Ownable {
     /**
+     * @dev Mapping from token IDs to their creator.
+     */
+    mapping(uint256 => address) private _creator;
+
+    /**
      * @dev Mapping from token IDs to their total supplies.
      */
     mapping(uint256 => uint256) internal _totalSupply;
@@ -16,6 +21,12 @@ contract TaureumERC1155 is ERC1155, Ownable {
      * @dev Mapping from NFT ID to metadata uri.
      */
     mapping(uint256 => string) internal _idToUri;
+
+    modifier creatorOrApproved(address creator) {
+        address operator = msg.sender;
+        require(operator == creator || isApprovedForAll(creator, msg.sender), "ERC1155: caller is not creator nor approved");
+        _;
+    }
 
     /**
      * @dev Create a new TaureumERC1155 contract and set the `_uri` value.
@@ -39,18 +50,34 @@ contract TaureumERC1155 is ERC1155, Ownable {
     }
 
     /**
+     * @dev Return the creator of an NFT given its id.
+     */
+    function getCreator(uint256 _id) external view returns (address) {
+        return _creator[_id];
+    }
+
+    /**
      * @dev Mint a new ERC1155 token. A token can only be minted once.
+     * @notice It reverts if
+     *      - The `msg.sender` is not `to` or approved by `to`.
+     *      - `to` is the zero address.
+     *      - `to` cannot receive the token.
      */
     function mint(
         address to,
         string calldata uri,
-        uint256 supply,
+        uint256 amount,
         bytes memory data
     ) external virtual returns (uint256){
         uint256 id = uint256(keccak256(abi.encode(to, uri)));
 
-        _mint(to, id, supply, data);
+        _mint(to, id, amount, data);
         _setTokenUri(id, uri);
+
+        // save the creator (if needed)
+        if (_creator[id] == address(0x0)) {
+            _saveCreator(id, to);
+        }
 
         return id;
     }
@@ -61,19 +88,24 @@ contract TaureumERC1155 is ERC1155, Ownable {
     function mintBatch(
         address to,
         string[] calldata uriList,
-        uint256[] calldata supplies,
+        uint256[] calldata amounts,
         bytes memory data
     ) external virtual returns (uint256[] memory) {
-        require(uriList.length == supplies.length, "ERC1155: mintBatch lengths mismatch");
+        require(uriList.length == amounts.length, "ERC1155: mintBatch lengths mismatch");
 
         uint256[] memory ids = new uint256[](uriList.length);
         for (uint256 i = 0; i < uriList.length; ++i) {
             ids[i] = uint256(keccak256(abi.encode(to, uriList[i])));
         }
 
-        _mintBatch(to, ids, supplies, data);
+        _mintBatch(to, ids, amounts, data);
         for (uint256 i = 0; i < uriList.length; ++i) {
             _setTokenUri(ids[i], uriList[i]);
+
+            // save the creator (if needed)
+            if (_creator[ids[i]] == address(0x0)) {
+                _saveCreator(ids[i], to);
+            }
         }
 
         return ids;
@@ -132,14 +164,22 @@ contract TaureumERC1155 is ERC1155, Ownable {
     }
 
     /**
+     * @dev Save the creator of a token.
+     * @notice It reverts when
+     *   - `_creator` is the zero address; or
+     *   - the tokenId already had a creator.
+     */
+    function _saveCreator(uint256 tokenId, address creator_) internal {
+        require(creator_ != address(0x0), "ERC1155: zero address creator");
+        require(_creator[tokenId] == address(0x0), "ERC1155: already had a creator");
+        _creator[tokenId] = creator_;
+    }
+
+    /**
      * @dev See {ERC1155-_mint}.
      */
-    function _mint(
-        address account,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal virtual override {
+    function _mint(address account, uint256 id, uint256 amount, bytes memory data) internal virtual override {
+        require(amount > 0, "ERC1155: mint amount is zero");
         super._mint(account, id, amount, data);
         _totalSupply[id] += amount;
     }
