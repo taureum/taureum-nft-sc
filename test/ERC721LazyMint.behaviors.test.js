@@ -31,19 +31,6 @@ const checkRedeemEvents = async (logs, tokenId, minter, redeemer) => {
     await checkTransferEvent(mintEvent, tokenId, ZERO_ADDRESS, minter)
     await checkApproveEvent(clearApprovalEvent, tokenId, minter, ZERO_ADDRESS)
     await checkTransferEvent(transferEvent, tokenId, minter, redeemer)
-
-
-    // assert.equal(mintEvent.from, ZERO_ADDRESS, "mint `from` is invalid")
-    // assert.equal(mintEvent.to, minter, "mint `to` is invalid")
-    // assert.equal(pad(mintEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "mint `tokenId` is invalid")
-
-    // assert.equal(clearApprovalEvent.owner, minter, "clearApproval `from` is invalid")
-    // assert.equal(clearApprovalEvent.approved, ZERO_ADDRESS, "clearApproval `to` is invalid")
-    // assert.equal(pad(clearApprovalEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "clearApproval `tokenId` is invalid")
-    //
-    // assert.equal(transferEvent.from, minter, "transfer `from` is invalid")
-    // assert.equal(transferEvent.to, redeemer, "transfer `to` is invalid")
-    // assert.equal(pad(transferEvent.tokenId.toString("hex"), 64), pad(tokenId, 64), "transfer `tokenId` is invalid")
 }
 const redeemShouldSucceed = async (instance, result, lazyMintData, minter, redeemer) => {
     await checkRedeemEvents(result.logs, lazyMintData.expectedTokenId.toString("hex").substr(2), minter, redeemer)
