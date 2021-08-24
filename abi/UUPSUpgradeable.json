@@ -87,32 +87,32 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.0;\n\nimport \"../ERC1967/ERC1967Upgrade.sol\";\n\n/**\n * @dev Base contract for building openzeppelin-upgrades compatible implementations for the {ERC1967Proxy}. It includes\n * publicly available upgrade functions that are called by the plugin and by the secure upgrade mechanism to verify\n * continuation of the upgradability.\n *\n * The {_authorizeUpgrade} function MUST be overridden to include access restriction to the upgrade mechanism.\n *\n * _Available since v4.1._\n */\nabstract contract UUPSUpgradeable is ERC1967Upgrade {\n    function upgradeTo(address newImplementation) external virtual {\n        _authorizeUpgrade(newImplementation);\n        _upgradeToAndCallSecure(newImplementation, bytes(\"\"), false);\n    }\n\n    function upgradeToAndCall(address newImplementation, bytes memory data) external payable virtual {\n        _authorizeUpgrade(newImplementation);\n        _upgradeToAndCallSecure(newImplementation, data, true);\n    }\n\n    function _authorizeUpgrade(address newImplementation) internal virtual;\n}\n",
-  "sourcePath": "/home/toor/nodejs/truffle/nft_demo/taudefi/taudefi-nft/contracts/lib/proxy/utils/UUPSUpgradeable.sol",
+  "sourcePath": "/home/toor/nodejs/truffle/nft_demo/taureum/taureum-nft-sc/contracts/lib/proxy/utils/UUPSUpgradeable.sol",
   "ast": {
     "absolutePath": "project:/contracts/lib/proxy/utils/UUPSUpgradeable.sol",
     "exportedSymbols": {
       "Address": [
-        10832
+        10643
       ],
       "ERC1967Upgrade": [
-        3021
+        2644
       ],
       "IBeacon": [
-        3165
+        2788
       ],
       "StorageSlot": [
-        11227
+        11038
       ],
       "UUPSUpgradeable": [
-        3635
+        3258
       ]
     },
-    "id": 3636,
+    "id": 3259,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3588,
+        "id": 3211,
         "literals": [
           "solidity",
           "^",
@@ -120,17 +120,17 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:22"
+        "src": "33:23:20"
       },
       {
         "absolutePath": "project:/contracts/lib/proxy/ERC1967/ERC1967Upgrade.sol",
         "file": "../ERC1967/ERC1967Upgrade.sol",
-        "id": 3589,
+        "id": 3212,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 3636,
-        "sourceUnit": 3022,
-        "src": "58:39:22",
+        "scope": 3259,
+        "sourceUnit": 2645,
+        "src": "58:39:20",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -139,51 +139,51 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 3591,
+              "id": 3214,
               "name": "ERC1967Upgrade",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3021,
-              "src": "562:14:22"
+              "referencedDeclaration": 2644,
+              "src": "562:14:20"
             },
-            "id": 3592,
+            "id": 3215,
             "nodeType": "InheritanceSpecifier",
-            "src": "562:14:22"
+            "src": "562:14:20"
           }
         ],
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 3590,
+          "id": 3213,
           "nodeType": "StructuredDocumentation",
-          "src": "99:425:22",
+          "src": "99:425:20",
           "text": " @dev Base contract for building openzeppelin-upgrades compatible implementations for the {ERC1967Proxy}. It includes\n publicly available upgrade functions that are called by the plugin and by the secure upgrade mechanism to verify\n continuation of the upgradability.\n The {_authorizeUpgrade} function MUST be overridden to include access restriction to the upgrade mechanism.\n _Available since v4.1._"
         },
         "fullyImplemented": false,
-        "id": 3635,
+        "id": 3258,
         "linearizedBaseContracts": [
-          3635,
-          3021
+          3258,
+          2644
         ],
         "name": "UUPSUpgradeable",
-        "nameLocation": "543:15:22",
+        "nameLocation": "543:15:20",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 3610,
+              "id": 3233,
               "nodeType": "Block",
-              "src": "646:123:22",
+              "src": "646:123:20",
               "statements": [
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3598,
+                        "id": 3221,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3594,
-                        "src": "674:17:22",
+                        "referencedDeclaration": 3217,
+                        "src": "674:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -197,18 +197,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 3597,
+                      "id": 3220,
                       "name": "_authorizeUpgrade",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3634,
-                      "src": "656:17:22",
+                      "referencedDeclaration": 3257,
+                      "src": "656:17:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 3599,
+                    "id": 3222,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -216,27 +216,27 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "656:36:22",
+                    "src": "656:36:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3600,
+                  "id": 3223,
                   "nodeType": "ExpressionStatement",
-                  "src": "656:36:22"
+                  "src": "656:36:20"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3602,
+                        "id": 3225,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3594,
-                        "src": "726:17:22",
+                        "referencedDeclaration": 3217,
+                        "src": "726:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -246,14 +246,14 @@
                         "arguments": [
                           {
                             "hexValue": "",
-                            "id": 3605,
+                            "id": 3228,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "kind": "string",
                             "lValueRequested": false,
                             "nodeType": "Literal",
-                            "src": "751:2:22",
+                            "src": "751:2:20",
                             "typeDescriptions": {
                               "typeIdentifier": "t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
                               "typeString": "literal_string \"\""
@@ -268,26 +268,26 @@
                               "typeString": "literal_string \"\""
                             }
                           ],
-                          "id": 3604,
+                          "id": 3227,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "745:5:22",
+                          "src": "745:5:20",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                             "typeString": "type(bytes storage pointer)"
                           },
                           "typeName": {
-                            "id": 3603,
+                            "id": 3226,
                             "name": "bytes",
                             "nodeType": "ElementaryTypeName",
-                            "src": "745:5:22",
+                            "src": "745:5:20",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 3606,
+                        "id": 3229,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -295,7 +295,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "745:9:22",
+                        "src": "745:9:20",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
@@ -304,14 +304,14 @@
                       },
                       {
                         "hexValue": "66616c7365",
-                        "id": 3607,
+                        "id": 3230,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "bool",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "756:5:22",
+                        "src": "756:5:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -334,18 +334,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 3601,
+                      "id": 3224,
                       "name": "_upgradeToAndCallSecure",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2857,
-                      "src": "702:23:22",
+                      "referencedDeclaration": 2480,
+                      "src": "702:23:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$_t_bool_$returns$__$",
                         "typeString": "function (address,bytes memory,bool)"
                       }
                     },
-                    "id": 3608,
+                    "id": 3231,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -353,40 +353,40 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "702:60:22",
+                    "src": "702:60:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3609,
+                  "id": 3232,
                   "nodeType": "ExpressionStatement",
-                  "src": "702:60:22"
+                  "src": "702:60:20"
                 }
               ]
             },
             "functionSelector": "3659cfe6",
-            "id": 3611,
+            "id": 3234,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "upgradeTo",
-            "nameLocation": "592:9:22",
+            "nameLocation": "592:9:20",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3595,
+              "id": 3218,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3594,
+                  "id": 3217,
                   "mutability": "mutable",
                   "name": "newImplementation",
-                  "nameLocation": "610:17:22",
+                  "nameLocation": "610:17:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3611,
-                  "src": "602:25:22",
+                  "scope": 3234,
+                  "src": "602:25:20",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -394,10 +394,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3593,
+                    "id": 3216,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "602:7:22",
+                    "src": "602:7:20",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -407,36 +407,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "601:27:22"
+              "src": "601:27:20"
             },
             "returnParameters": {
-              "id": 3596,
+              "id": 3219,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "646:0:22"
+              "src": "646:0:20"
             },
-            "scope": 3635,
-            "src": "583:186:22",
+            "scope": 3258,
+            "src": "583:186:20",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "external"
           },
           {
             "body": {
-              "id": 3628,
+              "id": 3251,
               "nodeType": "Block",
-              "src": "872:117:22",
+              "src": "872:117:20",
               "statements": [
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3619,
+                        "id": 3242,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3613,
-                        "src": "900:17:22",
+                        "referencedDeclaration": 3236,
+                        "src": "900:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -450,18 +450,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 3618,
+                      "id": 3241,
                       "name": "_authorizeUpgrade",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3634,
-                      "src": "882:17:22",
+                      "referencedDeclaration": 3257,
+                      "src": "882:17:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 3620,
+                    "id": 3243,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -469,39 +469,39 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "882:36:22",
+                    "src": "882:36:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3621,
+                  "id": 3244,
                   "nodeType": "ExpressionStatement",
-                  "src": "882:36:22"
+                  "src": "882:36:20"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3623,
+                        "id": 3246,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3613,
-                        "src": "952:17:22",
+                        "referencedDeclaration": 3236,
+                        "src": "952:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 3624,
+                        "id": 3247,
                         "name": "data",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3615,
-                        "src": "971:4:22",
+                        "referencedDeclaration": 3238,
+                        "src": "971:4:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
@@ -509,14 +509,14 @@
                       },
                       {
                         "hexValue": "74727565",
-                        "id": 3625,
+                        "id": 3248,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "bool",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "977:4:22",
+                        "src": "977:4:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -539,18 +539,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 3622,
+                      "id": 3245,
                       "name": "_upgradeToAndCallSecure",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2857,
-                      "src": "928:23:22",
+                      "referencedDeclaration": 2480,
+                      "src": "928:23:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$_t_bool_$returns$__$",
                         "typeString": "function (address,bytes memory,bool)"
                       }
                     },
-                    "id": 3626,
+                    "id": 3249,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -558,40 +558,40 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "928:54:22",
+                    "src": "928:54:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3627,
+                  "id": 3250,
                   "nodeType": "ExpressionStatement",
-                  "src": "928:54:22"
+                  "src": "928:54:20"
                 }
               ]
             },
             "functionSelector": "4f1ef286",
-            "id": 3629,
+            "id": 3252,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "upgradeToAndCall",
-            "nameLocation": "784:16:22",
+            "nameLocation": "784:16:20",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3616,
+              "id": 3239,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3613,
+                  "id": 3236,
                   "mutability": "mutable",
                   "name": "newImplementation",
-                  "nameLocation": "809:17:22",
+                  "nameLocation": "809:17:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3629,
-                  "src": "801:25:22",
+                  "scope": 3252,
+                  "src": "801:25:20",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -599,10 +599,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3612,
+                    "id": 3235,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "801:7:22",
+                    "src": "801:7:20",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -613,13 +613,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 3615,
+                  "id": 3238,
                   "mutability": "mutable",
                   "name": "data",
-                  "nameLocation": "841:4:22",
+                  "nameLocation": "841:4:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3629,
-                  "src": "828:17:22",
+                  "scope": 3252,
+                  "src": "828:17:20",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -627,10 +627,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 3614,
+                    "id": 3237,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "828:5:22",
+                    "src": "828:5:20",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -639,41 +639,41 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "800:46:22"
+              "src": "800:46:20"
             },
             "returnParameters": {
-              "id": 3617,
+              "id": 3240,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "872:0:22"
+              "src": "872:0:20"
             },
-            "scope": 3635,
-            "src": "775:214:22",
+            "scope": 3258,
+            "src": "775:214:20",
             "stateMutability": "payable",
             "virtual": true,
             "visibility": "external"
           },
           {
-            "id": 3634,
+            "id": 3257,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "_authorizeUpgrade",
-            "nameLocation": "1004:17:22",
+            "nameLocation": "1004:17:20",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3632,
+              "id": 3255,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3631,
+                  "id": 3254,
                   "mutability": "mutable",
                   "name": "newImplementation",
-                  "nameLocation": "1030:17:22",
+                  "nameLocation": "1030:17:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3634,
-                  "src": "1022:25:22",
+                  "scope": 3257,
+                  "src": "1022:25:20",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -681,10 +681,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3630,
+                    "id": 3253,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1022:7:22",
+                    "src": "1022:7:20",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -694,53 +694,53 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1021:27:22"
+              "src": "1021:27:20"
             },
             "returnParameters": {
-              "id": 3633,
+              "id": 3256,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1065:0:22"
+              "src": "1065:0:20"
             },
-            "scope": 3635,
-            "src": "995:71:22",
+            "scope": 3258,
+            "src": "995:71:20",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "internal"
           }
         ],
-        "scope": 3636,
-        "src": "525:543:22",
+        "scope": 3259,
+        "src": "525:543:20",
         "usedErrors": []
       }
     ],
-    "src": "33:1036:22"
+    "src": "33:1036:20"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/lib/proxy/utils/UUPSUpgradeable.sol",
     "exportedSymbols": {
       "Address": [
-        10832
+        10643
       ],
       "ERC1967Upgrade": [
-        3021
+        2644
       ],
       "IBeacon": [
-        3165
+        2788
       ],
       "StorageSlot": [
-        11227
+        11038
       ],
       "UUPSUpgradeable": [
-        3635
+        3258
       ]
     },
-    "id": 3636,
+    "id": 3259,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3588,
+        "id": 3211,
         "literals": [
           "solidity",
           "^",
@@ -748,17 +748,17 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:22"
+        "src": "33:23:20"
       },
       {
         "absolutePath": "project:/contracts/lib/proxy/ERC1967/ERC1967Upgrade.sol",
         "file": "../ERC1967/ERC1967Upgrade.sol",
-        "id": 3589,
+        "id": 3212,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 3636,
-        "sourceUnit": 3022,
-        "src": "58:39:22",
+        "scope": 3259,
+        "sourceUnit": 2645,
+        "src": "58:39:20",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -767,51 +767,51 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 3591,
+              "id": 3214,
               "name": "ERC1967Upgrade",
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3021,
-              "src": "562:14:22"
+              "referencedDeclaration": 2644,
+              "src": "562:14:20"
             },
-            "id": 3592,
+            "id": 3215,
             "nodeType": "InheritanceSpecifier",
-            "src": "562:14:22"
+            "src": "562:14:20"
           }
         ],
         "contractDependencies": [],
         "contractKind": "contract",
         "documentation": {
-          "id": 3590,
+          "id": 3213,
           "nodeType": "StructuredDocumentation",
-          "src": "99:425:22",
+          "src": "99:425:20",
           "text": " @dev Base contract for building openzeppelin-upgrades compatible implementations for the {ERC1967Proxy}. It includes\n publicly available upgrade functions that are called by the plugin and by the secure upgrade mechanism to verify\n continuation of the upgradability.\n The {_authorizeUpgrade} function MUST be overridden to include access restriction to the upgrade mechanism.\n _Available since v4.1._"
         },
         "fullyImplemented": false,
-        "id": 3635,
+        "id": 3258,
         "linearizedBaseContracts": [
-          3635,
-          3021
+          3258,
+          2644
         ],
         "name": "UUPSUpgradeable",
-        "nameLocation": "543:15:22",
+        "nameLocation": "543:15:20",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 3610,
+              "id": 3233,
               "nodeType": "Block",
-              "src": "646:123:22",
+              "src": "646:123:20",
               "statements": [
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3598,
+                        "id": 3221,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3594,
-                        "src": "674:17:22",
+                        "referencedDeclaration": 3217,
+                        "src": "674:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -825,18 +825,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 3597,
+                      "id": 3220,
                       "name": "_authorizeUpgrade",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3634,
-                      "src": "656:17:22",
+                      "referencedDeclaration": 3257,
+                      "src": "656:17:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 3599,
+                    "id": 3222,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -844,27 +844,27 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "656:36:22",
+                    "src": "656:36:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3600,
+                  "id": 3223,
                   "nodeType": "ExpressionStatement",
-                  "src": "656:36:22"
+                  "src": "656:36:20"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3602,
+                        "id": 3225,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3594,
-                        "src": "726:17:22",
+                        "referencedDeclaration": 3217,
+                        "src": "726:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -874,14 +874,14 @@
                         "arguments": [
                           {
                             "hexValue": "",
-                            "id": 3605,
+                            "id": 3228,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "kind": "string",
                             "lValueRequested": false,
                             "nodeType": "Literal",
-                            "src": "751:2:22",
+                            "src": "751:2:20",
                             "typeDescriptions": {
                               "typeIdentifier": "t_stringliteral_c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
                               "typeString": "literal_string \"\""
@@ -896,26 +896,26 @@
                               "typeString": "literal_string \"\""
                             }
                           ],
-                          "id": 3604,
+                          "id": 3227,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "745:5:22",
+                          "src": "745:5:20",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_bytes_storage_ptr_$",
                             "typeString": "type(bytes storage pointer)"
                           },
                           "typeName": {
-                            "id": 3603,
+                            "id": 3226,
                             "name": "bytes",
                             "nodeType": "ElementaryTypeName",
-                            "src": "745:5:22",
+                            "src": "745:5:20",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 3606,
+                        "id": 3229,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -923,7 +923,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "745:9:22",
+                        "src": "745:9:20",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
@@ -932,14 +932,14 @@
                       },
                       {
                         "hexValue": "66616c7365",
-                        "id": 3607,
+                        "id": 3230,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "bool",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "756:5:22",
+                        "src": "756:5:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -962,18 +962,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 3601,
+                      "id": 3224,
                       "name": "_upgradeToAndCallSecure",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2857,
-                      "src": "702:23:22",
+                      "referencedDeclaration": 2480,
+                      "src": "702:23:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$_t_bool_$returns$__$",
                         "typeString": "function (address,bytes memory,bool)"
                       }
                     },
-                    "id": 3608,
+                    "id": 3231,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -981,40 +981,40 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "702:60:22",
+                    "src": "702:60:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3609,
+                  "id": 3232,
                   "nodeType": "ExpressionStatement",
-                  "src": "702:60:22"
+                  "src": "702:60:20"
                 }
               ]
             },
             "functionSelector": "3659cfe6",
-            "id": 3611,
+            "id": 3234,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "upgradeTo",
-            "nameLocation": "592:9:22",
+            "nameLocation": "592:9:20",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3595,
+              "id": 3218,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3594,
+                  "id": 3217,
                   "mutability": "mutable",
                   "name": "newImplementation",
-                  "nameLocation": "610:17:22",
+                  "nameLocation": "610:17:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3611,
-                  "src": "602:25:22",
+                  "scope": 3234,
+                  "src": "602:25:20",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1022,10 +1022,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3593,
+                    "id": 3216,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "602:7:22",
+                    "src": "602:7:20",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1035,36 +1035,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "601:27:22"
+              "src": "601:27:20"
             },
             "returnParameters": {
-              "id": 3596,
+              "id": 3219,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "646:0:22"
+              "src": "646:0:20"
             },
-            "scope": 3635,
-            "src": "583:186:22",
+            "scope": 3258,
+            "src": "583:186:20",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "external"
           },
           {
             "body": {
-              "id": 3628,
+              "id": 3251,
               "nodeType": "Block",
-              "src": "872:117:22",
+              "src": "872:117:20",
               "statements": [
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3619,
+                        "id": 3242,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3613,
-                        "src": "900:17:22",
+                        "referencedDeclaration": 3236,
+                        "src": "900:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1078,18 +1078,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 3618,
+                      "id": 3241,
                       "name": "_authorizeUpgrade",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3634,
-                      "src": "882:17:22",
+                      "referencedDeclaration": 3257,
+                      "src": "882:17:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 3620,
+                    "id": 3243,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1097,39 +1097,39 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "882:36:22",
+                    "src": "882:36:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3621,
+                  "id": 3244,
                   "nodeType": "ExpressionStatement",
-                  "src": "882:36:22"
+                  "src": "882:36:20"
                 },
                 {
                   "expression": {
                     "arguments": [
                       {
-                        "id": 3623,
+                        "id": 3246,
                         "name": "newImplementation",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3613,
-                        "src": "952:17:22",
+                        "referencedDeclaration": 3236,
+                        "src": "952:17:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         }
                       },
                       {
-                        "id": 3624,
+                        "id": 3247,
                         "name": "data",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 3615,
-                        "src": "971:4:22",
+                        "referencedDeclaration": 3238,
+                        "src": "971:4:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_memory_ptr",
                           "typeString": "bytes memory"
@@ -1137,14 +1137,14 @@
                       },
                       {
                         "hexValue": "74727565",
-                        "id": 3625,
+                        "id": 3248,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
                         "kind": "bool",
                         "lValueRequested": false,
                         "nodeType": "Literal",
-                        "src": "977:4:22",
+                        "src": "977:4:20",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
@@ -1167,18 +1167,18 @@
                           "typeString": "bool"
                         }
                       ],
-                      "id": 3622,
+                      "id": 3245,
                       "name": "_upgradeToAndCallSecure",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2857,
-                      "src": "928:23:22",
+                      "referencedDeclaration": 2480,
+                      "src": "928:23:20",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$_t_bool_$returns$__$",
                         "typeString": "function (address,bytes memory,bool)"
                       }
                     },
-                    "id": 3626,
+                    "id": 3249,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1186,40 +1186,40 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "928:54:22",
+                    "src": "928:54:20",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 3627,
+                  "id": 3250,
                   "nodeType": "ExpressionStatement",
-                  "src": "928:54:22"
+                  "src": "928:54:20"
                 }
               ]
             },
             "functionSelector": "4f1ef286",
-            "id": 3629,
+            "id": 3252,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "upgradeToAndCall",
-            "nameLocation": "784:16:22",
+            "nameLocation": "784:16:20",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3616,
+              "id": 3239,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3613,
+                  "id": 3236,
                   "mutability": "mutable",
                   "name": "newImplementation",
-                  "nameLocation": "809:17:22",
+                  "nameLocation": "809:17:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3629,
-                  "src": "801:25:22",
+                  "scope": 3252,
+                  "src": "801:25:20",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1227,10 +1227,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3612,
+                    "id": 3235,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "801:7:22",
+                    "src": "801:7:20",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1241,13 +1241,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 3615,
+                  "id": 3238,
                   "mutability": "mutable",
                   "name": "data",
-                  "nameLocation": "841:4:22",
+                  "nameLocation": "841:4:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3629,
-                  "src": "828:17:22",
+                  "scope": 3252,
+                  "src": "828:17:20",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -1255,10 +1255,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 3614,
+                    "id": 3237,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "828:5:22",
+                    "src": "828:5:20",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -1267,41 +1267,41 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "800:46:22"
+              "src": "800:46:20"
             },
             "returnParameters": {
-              "id": 3617,
+              "id": 3240,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "872:0:22"
+              "src": "872:0:20"
             },
-            "scope": 3635,
-            "src": "775:214:22",
+            "scope": 3258,
+            "src": "775:214:20",
             "stateMutability": "payable",
             "virtual": true,
             "visibility": "external"
           },
           {
-            "id": 3634,
+            "id": 3257,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "_authorizeUpgrade",
-            "nameLocation": "1004:17:22",
+            "nameLocation": "1004:17:20",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3632,
+              "id": 3255,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3631,
+                  "id": 3254,
                   "mutability": "mutable",
                   "name": "newImplementation",
-                  "nameLocation": "1030:17:22",
+                  "nameLocation": "1030:17:20",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3634,
-                  "src": "1022:25:22",
+                  "scope": 3257,
+                  "src": "1022:25:20",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1309,10 +1309,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3630,
+                    "id": 3253,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1022:7:22",
+                    "src": "1022:7:20",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -1322,27 +1322,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1021:27:22"
+              "src": "1021:27:20"
             },
             "returnParameters": {
-              "id": 3633,
+              "id": 3256,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1065:0:22"
+              "src": "1065:0:20"
             },
-            "scope": 3635,
-            "src": "995:71:22",
+            "scope": 3258,
+            "src": "995:71:20",
             "stateMutability": "nonpayable",
             "virtual": true,
             "visibility": "internal"
           }
         ],
-        "scope": 3636,
-        "src": "525:543:22",
+        "scope": 3259,
+        "src": "525:543:20",
         "usedErrors": []
       }
     ],
-    "src": "33:1036:22"
+    "src": "33:1036:20"
   },
   "compiler": {
     "name": "solc",
@@ -1350,7 +1350,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-07-20T03:54:47.419Z",
+  "updatedAt": "2021-08-24T07:00:08.840Z",
   "devdoc": {
     "details": "Base contract for building openzeppelin-upgrades compatible implementations for the {ERC1967Proxy}. It includes publicly available upgrade functions that are called by the plugin and by the secure upgrade mechanism to verify continuation of the upgradability. The {_authorizeUpgrade} function MUST be overridden to include access restriction to the upgrade mechanism. _Available since v4.1._",
     "kind": "dev",
