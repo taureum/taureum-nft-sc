@@ -11,6 +11,7 @@ const ERC721_NOT_OWNER_OR_APPROVED = "ERC721: transfer caller is not owner nor a
 const ERC721_NOT_OWNER_OR_APPROVED_FOR_ALL = "ERC721: approve caller is not owner nor approved for all"
 const NOT_CONTRACT_OWNER = "Ownable: caller is not the owner"
 const ERC721_METADATA_URI_QUERY_FOR_NONEXISTENT_TOKEN = "ERC721Metadata: URI query for nonexistent token"
+const ERC721_PAUSED = "ERC721Pausable: token transfer while paused"
 
 module.exports = {
     ERC721_MINT_TO_ZERO_ADDRESS_ERROR,
@@ -25,5 +26,6 @@ module.exports = {
     ERC721_NOT_OWNER_OR_APPROVED,
     ERC721_NOT_OWNER_OR_APPROVED_FOR_ALL,
     ERC721_METADATA_URI_QUERY_FOR_NONEXISTENT_TOKEN,
+    ERC721_PAUSED,
     NOT_CONTRACT_OWNER,
 }

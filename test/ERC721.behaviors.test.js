@@ -14,6 +14,7 @@ const {
     ERC721_APPROVE_SELF,
     ERC721_NOT_OWNER_OR_APPROVED,
     ERC721_NOT_OWNER_OR_APPROVED_FOR_ALL,
+    ERC721_PAUSED,
 } = require("./helper/ERC721/errors")
 
 const {
@@ -24,8 +25,11 @@ const {
 const {
     ZERO_ADDRESS,
     ERC721_mintToken,
-    ERC721_mintRandomToken,
+    ERC721_mintRandomToken, randomURI, ERC1155_mintToken, ERC1155_mintRandomToken,
 } = require("./helper/helper")
+
+const PAUSABLE_PAUSED = "Pausable: paused"
+const PAUSABLE_NOT_PAUSED = "Pausable: not paused"
 
 require('chai')
     .use(require('chai-as-promised'))
@@ -115,6 +119,53 @@ contract('ERC721', (accounts) => {
         })
     })
 
+    describe("pause", function () {
+        it("should not allow not-owner to pause the contract", async () => {
+            try {
+                await instance.pause({from: notOwner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, "Ownable: caller is not the owner")
+            }
+        })
+
+        it("should allow the owner to pause and un-pause the contract", async () => {
+            await instance.pause({from: owner})
+            await instance.unPause({from: owner})
+        })
+
+        it("should not allow not-owner to un-pause the contract", async () => {
+            try {
+                await instance.pause({from: owner})
+                await instance.unPause({from: notOwner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, "Ownable: caller is not the owner")
+                await instance.unPause({from: owner})
+            }
+        })
+
+        it("should not allow to pause when the contract is paused", async () => {
+            await instance.pause({from: owner})
+            try {
+                await instance.pause({from: owner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
+
+        it("should not allow to un-pause when the contract is un-paused", async () => {
+            try {
+                await instance.unPause({from: owner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_NOT_PAUSED)
+            }
+        })
+    })
+
     describe('minting', async () => {
         it("create a simple NFT", async () => {
             let uri = crypto.randomBytes(32).toString('hex');
@@ -133,6 +184,32 @@ contract('ERC721', (accounts) => {
             } catch (error) {
                 shouldErrorContainMessage(error, ERC721_MINT_TO_ZERO_ADDRESS_ERROR)
             }
+        })
+
+        it("should not be able to mint when the contract is paused", async () => {
+            await instance.pause({from: owner})
+            try {
+                let uri = randomURI()
+                await ERC721_mintToken(instance, owner, uri)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC721_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
+
+        it("should be able to mint when the contract is un-paused", async () => {
+            await instance.pause({from: owner})
+            await instance.unPause({from: owner})
+
+            let uri = randomURI()
+            let supply = crypto.randomInt(1000000000000)
+            const result = await ERC721_mintToken(instance, owner, uri, supply)
+            let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+                [owner, uri])
+            let expectedTokenID = web3.utils.soliditySha3(packed)
+
+            await mintShouldSucceed(instance, result, owner, expectedTokenID, baseURI, uri)
         })
     })
 
@@ -440,6 +517,20 @@ contract('ERC721', (accounts) => {
                 shouldErrorContainMessage(error, ERC721_NOT_OWNER_OR_APPROVED)
             }
         })
+
+        it("should not be able to transferFrom when the contract is paused", async () => {
+            let result = await ERC721_mintRandomToken(instance, owner)
+            const event = result.logs[0].args
+            let tokenId = event.tokenId
+            await instance.pause({from: owner})
+            try {
+                await instance.transferFrom(owner, anotherOwner, tokenId)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC721_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
     })
 
     describe('safeTransferFrom', async () => {
@@ -583,6 +674,20 @@ contract('ERC721', (accounts) => {
                 shouldNotPass()
             } catch (error) {
                 shouldErrorContainMessage(error, ERC721_NOT_OWNER_OR_APPROVED)
+            }
+        })
+
+        it("should not be able to safeTransferFrom when the contract is paused", async () => {
+            let result = await ERC721_mintRandomToken(instance, owner)
+            const event = result.logs[0].args
+            let tokenId = event.tokenId
+            await instance.pause({from: owner})
+            try {
+                await instance.safeTransferFrom(owner, anotherOwner, tokenId)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, ERC721_PAUSED)
+                await instance.unPause({from: owner})
             }
         })
     })

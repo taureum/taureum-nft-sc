@@ -18,6 +18,7 @@ const {
     ERC1155_BALANCE_QUERY_FOR_ZERO_ADDRESS,
     ERC1155_SETTING_APPROVAL_FOR_SELF,
     ERC1155_INSUFFICIENT_BALANCE,
+    ERC1155_PAUSED,
 } = require("./helper/ERC1155/errors");
 const {BigNumber} = require("ethers");
 
@@ -218,7 +219,7 @@ contract('ERC1155', (accounts) => {
                 await ERC1155_mintToken(instance, owner, uri, supply)
                 shouldNotPass()
             } catch (e) {
-                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                shouldErrorContainMessage(e, ERC1155_PAUSED)
                 await instance.unPause({from: owner})
             }
         })
@@ -316,7 +317,7 @@ contract('ERC1155', (accounts) => {
                 await ERC1155_mintBatchToken(instance, owner, uris, supplies)
                 shouldNotPass()
             } catch (e) {
-                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                shouldErrorContainMessage(e, ERC1155_PAUSED)
                 await instance.unPause({from: owner})
             }
         })
@@ -420,20 +421,6 @@ contract('ERC1155', (accounts) => {
                 shouldErrorContainMessage(e, ERC1155_SETTING_APPROVAL_FOR_SELF)
             }
         });
-
-        it("should not be able to setApprovalForAll when the contract is paused", async () => {
-            await instance.pause({from: owner})
-            try {
-                let isApproved = crypto.randomInt(2) === 1
-                let result = await instance.setApprovalForAll(operator, isApproved, {from: owner})
-
-                await approveForAllShouldSucceed(instance, result, owner, operator, isApproved)
-                shouldNotPass()
-            } catch (e) {
-                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
-                await instance.unPause({from: owner})
-            }
-        })
     })
 
     describe('safeTransferFrom', function () {
@@ -489,10 +476,10 @@ contract('ERC1155', (accounts) => {
             let tokenID = res.logs[0].args.id
             await instance.pause({from: owner})
             try {
-                await instance.safeTransferFrom(owner, ZERO_ADDRESS, tokenID, 1, '0x')
+                await instance.safeTransferFrom(owner, anotherOwner, tokenID, 1, '0x')
                 shouldNotPass()
             } catch (e) {
-                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                shouldErrorContainMessage(e, ERC1155_PAUSED)
                 await instance.unPause({from: owner})
             }
         })

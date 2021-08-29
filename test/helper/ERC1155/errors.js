@@ -6,6 +6,7 @@ const ERC1155_SETTING_APPROVAL_FOR_SELF = "ERC1155: setting approval status for 
 const ERC1155_INSUFFICIENT_BALANCE = "ERC1155: insufficient balance for transfer"
 const ERC1155_NOT_CREATOR_OR_APPROVED = "ERC1155: caller is not creator nor approved"
 const ERC1155_ALREADY_REDEEMED = "ERC1155: mint data already redeemed"
+const ERC1155_PAUSED = "ERC1155Pausable: token transfer while paused"
 
 module.exports = {
     ERC1155_TOKEN_EXISTED,
@@ -16,4 +17,5 @@ module.exports = {
     ERC1155_INSUFFICIENT_BALANCE,
     ERC1155_NOT_CREATOR_OR_APPROVED,
     ERC1155_ALREADY_REDEEMED,
+    ERC1155_PAUSED,
 }
