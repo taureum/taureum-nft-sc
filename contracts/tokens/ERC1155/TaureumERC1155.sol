@@ -6,8 +6,9 @@ import "../../lib/token/ERC1155/ERC1155.sol";
 import "../../lib/token/ERC1155/extensions/ERC1155Supply.sol";
 import "../../lib/access/Ownable.sol";
 import "../../lib/security/Pausable.sol";
+import "../../lib/token/ERC1155/extensions/ERC1155Pausable.sol";
 
-contract TaureumERC1155 is ERC1155, Ownable, Pausable {
+contract TaureumERC1155 is ERC1155Pausable, Ownable {
     /**
      * @dev Mapping from token IDs to their creator.
      */
@@ -85,7 +86,7 @@ contract TaureumERC1155 is ERC1155, Ownable, Pausable {
         string calldata uri_,
         uint256 amount,
         bytes memory data
-    ) external virtual whenNotPaused returns (uint256){
+    ) external virtual returns (uint256){
         uint256 id = uint256(keccak256(abi.encode(to, uri_)));
 
         _mint(to, id, amount, data);
@@ -107,7 +108,7 @@ contract TaureumERC1155 is ERC1155, Ownable, Pausable {
         string[] calldata uriList,
         uint256[] calldata amounts,
         bytes memory data
-    ) external virtual whenNotPaused returns (uint256[] memory) {
+    ) external virtual returns (uint256[] memory) {
         require(uriList.length == amounts.length, "ERC1155: mintBatch lengths mismatch");
 
         uint256[] memory ids = new uint256[](uriList.length);
@@ -126,49 +127,6 @@ contract TaureumERC1155 is ERC1155, Ownable, Pausable {
         }
 
         return ids;
-    }
-
-    /**
-     * @dev See {IERC1155-setApprovalForAll}.
-     */
-    function setApprovalForAll(address operator, bool approved) public virtual override whenNotPaused {
-        super.setApprovalForAll(operator, approved);
-    }
-
-    /**
-     * @dev See {IERC1155-safeTransferFrom}.
-     */
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    )
-    public
-    virtual
-    override
-    whenNotPaused
-    {
-        super.safeTransferFrom(from, to, id, amount, data);
-    }
-
-    /**
-     * @dev See {IERC1155-safeBatchTransferFrom}.
-     */
-    function safeBatchTransferFrom(
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    )
-    public
-    virtual
-    override
-    whenNotPaused
-    {
-        super.safeBatchTransferFrom(from, to, ids, amounts, data);
     }
 
     /**

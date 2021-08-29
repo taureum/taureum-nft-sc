@@ -52,7 +52,7 @@ contract TaureumERC721Enumerable is TaureumERC721, ERC721Enumerable {
      *
      * To learn more about hooks, head to xref:ROOT:extending-contracts.adoc#using-hooks[Using Hooks].
      */
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721Pausable, ERC721Enumerable) {
         ERC721Enumerable._beforeTokenTransfer(from, to, tokenId);
     }
 }

@@ -4,8 +4,10 @@ pragma solidity 0.8.4;
 
 import "../../lib/token/ERC721/ERC721.sol";
 import "../../lib/access/Ownable.sol";
+import "../../lib/security/Pausable.sol";
+import "../../lib/token/ERC721/extensions/ERC721Pausable.sol";
 
-contract TaureumERC721 is ERC721, Ownable {
+contract TaureumERC721 is ERC721Pausable, Ownable {
     /**
      * @dev Mapping from NFT ID to metadata uri.
      */
@@ -20,8 +22,24 @@ contract TaureumERC721 is ERC721, Ownable {
      * @dev Create a new TaureumERC721 contract.
      *
      */
-    constructor() ERC721("Taureum ERC721", "Taureum") Ownable() {
+    constructor() ERC721("Taureum ERC721", "Taureum") Ownable() Pausable() {
         __baseURI = "";
+    }
+
+    /**
+     * @dev Pause the contract in case of bugs/attacks.
+     * @notice Only the owner can call this method.
+     */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Resume the contract after being paused.
+     * @notice Only the owner can call this method.
+     */
+    function unPause() public onlyOwner {
+        _unpause();
     }
 
     /**
@@ -81,7 +99,7 @@ contract TaureumERC721 is ERC721, Ownable {
     /**
      * @dev Sets new value for the `__baseURI`. This operation can only been done by the owner of this contract.
      */
-    function setBaseURI(string memory newBaseURI) external onlyOwner {
+    function setBaseURI(string memory newBaseURI) external onlyOwner whenNotPaused {
         __baseURI = newBaseURI;
     }
 
