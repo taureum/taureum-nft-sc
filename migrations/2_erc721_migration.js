@@ -19,17 +19,17 @@ module.exports = async function (deployer, network) {
         let mainContract
         let mainContractAddress
 
-        // await deployer.deploy(TaureumNFT);
-        // mainContract = await TaureumNFT.deployed();
-        // mainContractAddress = await mainContract.address
-        // console.log("Main contract (ERC721) deployed at address", mainContractAddress)
-        // setConfig('deployed.' + network + '.TaureumERC721', mainContractAddress)
-        //
-        // await deployer.deploy(TaureumNFTEnum);
-        // mainContract = await TaureumNFTEnum.deployed();
-        // mainContractAddress = await mainContract.address
-        // console.log("Main contract (ERC721Enumerable) deployed at address", mainContractAddress)
-        // setConfig('deployed.' + network + '.TaureumERC721Enumerable', mainContractAddress)
+        await deployer.deploy(TaureumNFT);
+        mainContract = await TaureumNFT.deployed();
+        mainContractAddress = await mainContract.address
+        console.log("Main contract (ERC721) deployed at address", mainContractAddress)
+        setConfig('deployed.' + network + '.TaureumERC721', mainContractAddress)
+
+        await deployer.deploy(TaureumNFTEnum);
+        mainContract = await TaureumNFTEnum.deployed();
+        mainContractAddress = await mainContract.address
+        console.log("Main contract (ERC721Enumerable) deployed at address", mainContractAddress)
+        setConfig('deployed.' + network + '.TaureumERC721Enumerable', mainContractAddress)
 
         await deployer.deploy(TaureumNFTLazyMint);
         mainContract = await TaureumNFTLazyMint.deployed();
