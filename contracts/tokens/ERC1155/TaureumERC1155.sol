@@ -5,8 +5,9 @@ pragma solidity 0.8.4;
 import "../../lib/token/ERC1155/ERC1155.sol";
 import "../../lib/token/ERC1155/extensions/ERC1155Supply.sol";
 import "../../lib/access/Ownable.sol";
+import "../../lib/security/Pausable.sol";
 
-contract TaureumERC1155 is ERC1155, Ownable {
+contract TaureumERC1155 is ERC1155, Ownable, Pausable {
     /**
      * @dev Mapping from token IDs to their creator.
      */
@@ -32,7 +33,7 @@ contract TaureumERC1155 is ERC1155, Ownable {
      * @dev Create a new TaureumERC1155 contract and set the `_uri` value.
      *
      */
-    constructor(string memory baseURI_) ERC1155(baseURI_) Ownable() {
+    constructor(string memory baseURI_) ERC1155(baseURI_) Ownable() Pausable() {
     }
 
     /**
@@ -57,6 +58,22 @@ contract TaureumERC1155 is ERC1155, Ownable {
     }
 
     /**
+     * @dev Pause the contract in case of bugs/attacks.
+     * @notice Only the owner can call this method.
+     */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @dev Resume the contract after being paused.
+     * @notice Only the owner can call this method.
+     */
+    function unPause() public onlyOwner {
+        _unpause();
+    }
+
+    /**
      * @dev Mint a new ERC1155 token. A token can only be minted once.
      * @notice It reverts if
      *      - The `msg.sender` is not `to` or approved by `to`.
@@ -68,7 +85,7 @@ contract TaureumERC1155 is ERC1155, Ownable {
         string calldata uri_,
         uint256 amount,
         bytes memory data
-    ) external virtual returns (uint256){
+    ) external virtual whenNotPaused returns (uint256){
         uint256 id = uint256(keccak256(abi.encode(to, uri_)));
 
         _mint(to, id, amount, data);
@@ -90,7 +107,7 @@ contract TaureumERC1155 is ERC1155, Ownable {
         string[] calldata uriList,
         uint256[] calldata amounts,
         bytes memory data
-    ) external virtual returns (uint256[] memory) {
+    ) external virtual whenNotPaused returns (uint256[] memory) {
         require(uriList.length == amounts.length, "ERC1155: mintBatch lengths mismatch");
 
         uint256[] memory ids = new uint256[](uriList.length);
@@ -112,6 +129,49 @@ contract TaureumERC1155 is ERC1155, Ownable {
     }
 
     /**
+     * @dev See {IERC1155-setApprovalForAll}.
+     */
+    function setApprovalForAll(address operator, bool approved) public virtual override whenNotPaused {
+        super.setApprovalForAll(operator, approved);
+    }
+
+    /**
+     * @dev See {IERC1155-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    )
+    public
+    virtual
+    override
+    whenNotPaused
+    {
+        super.safeTransferFrom(from, to, id, amount, data);
+    }
+
+    /**
+     * @dev See {IERC1155-safeBatchTransferFrom}.
+     */
+    function safeBatchTransferFrom(
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    )
+    public
+    virtual
+    override
+    whenNotPaused
+    {
+        super.safeBatchTransferFrom(from, to, ids, amounts, data);
+    }
+
+    /**
      * @dev Sets a new URI for all token types, by relying on the token type ID
      * substitution mechanism
      * https://eips.ethereum.org/EIPS/eip-1155#metadata[defined in the EIP].
@@ -130,7 +190,7 @@ contract TaureumERC1155 is ERC1155, Ownable {
      * Because these URIs cannot be meaningfully represented by the {URI} event,
      * this function emits no events.
      */
-    function setURI(string memory newURI) public onlyOwner {
+    function setURI(string memory newURI) public onlyOwner whenNotPaused {
         _setURI(newURI);
     }
 

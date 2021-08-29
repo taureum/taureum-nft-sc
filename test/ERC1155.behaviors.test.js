@@ -25,6 +25,9 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
+const PAUSABLE_PAUSED = "Pausable: paused"
+const PAUSABLE_NOT_PAUSED = "Pausable: not paused"
+
 const mintShouldSucceed = async (instance, result, minter, tokenId, totalSupply, baseURI, uri) => {
     await checkTransferSingleEvent(result.logs[0].args, minter, ZERO_ADDRESS, minter, tokenId.toString("hex"), totalSupply)
 
@@ -108,6 +111,53 @@ contract('ERC1155', (accounts) => {
         })
     })
 
+    describe("pause", function () {
+        it("should not allow not-owner to pause the contract", async () => {
+            try {
+                await instance.pause({from: notOwner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, "Ownable: caller is not the owner")
+            }
+        })
+
+        it("should allow the owner to pause and un-pause the contract", async () => {
+            await instance.pause({from: owner})
+            await instance.unPause({from: owner})
+        })
+
+        it("should not allow not-owner to un-pause the contract", async () => {
+            try {
+                await instance.pause({from: owner})
+                await instance.unPause({from: notOwner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, "Ownable: caller is not the owner")
+                await instance.unPause({from: owner})
+            }
+        })
+
+        it("should not allow to pause when the contract is paused", async () => {
+            await instance.pause({from: owner})
+            try {
+                await instance.pause({from: owner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
+
+        it("should not allow to un-pause when the contract is un-paused", async () => {
+            try {
+                await instance.unPause({from: owner})
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_NOT_PAUSED)
+            }
+        })
+    })
+
     describe('minting', async () => {
         it("create a simple NFT", async () => {
             let uri = randomURI()
@@ -158,6 +208,33 @@ contract('ERC1155', (accounts) => {
                 shouldErrorContainMessage(e, ERC1155_MINT_TO_ZERO_ADDRESS)
             }
 
+        })
+
+        it("should not be able to mint when the contract is paused", async () => {
+            await instance.pause({from: owner})
+            try {
+                let uri = randomURI()
+                let supply = crypto.randomInt(1000000000000)
+                await ERC1155_mintToken(instance, owner, uri, supply)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
+
+        it("should be able to mint when the contract is un-paused", async () => {
+            await instance.pause({from: owner})
+            await instance.unPause({from: owner})
+
+            let uri = randomURI()
+            let supply = crypto.randomInt(1000000000000)
+            const result = await ERC1155_mintToken(instance, owner, uri, supply)
+            let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+                [owner, uri])
+            let expectedTokenID = web3.utils.soliditySha3(packed)
+
+            await mintShouldSucceed(instance, result, owner, expectedTokenID, supply, baseURI, uri)
         })
     })
 
@@ -216,6 +293,32 @@ contract('ERC1155', (accounts) => {
 
             let tmpSupply = await instance.totalSupply(tokenId)
             assert.equal(tmpSupply, supplies[0] + supplies[1])
+        })
+
+        it("should not be able to mint batch when the contract is paused", async () => {
+            await instance.pause({from: owner})
+            try {
+                let uris = new Array(2)
+                let expectedIDs = new Array(2)
+                let supplies = new Array(2)
+
+                uris[0] = randomURI()
+                uris[1] = uris[0]
+
+                let packed = web3.eth.abi.encodeParameters(['address', 'string'],
+                    [owner, uris[0]])
+                expectedIDs[0] = web3.utils.soliditySha3(packed)
+                expectedIDs[1] = expectedIDs[0]
+
+                supplies[0] = crypto.randomInt(1000000000000)
+                supplies[1] = crypto.randomInt(1000000000000)
+
+                await ERC1155_mintBatchToken(instance, owner, uris, supplies)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                await instance.unPause({from: owner})
+            }
         })
     })
 
@@ -317,6 +420,20 @@ contract('ERC1155', (accounts) => {
                 shouldErrorContainMessage(e, ERC1155_SETTING_APPROVAL_FOR_SELF)
             }
         });
+
+        it("should not be able to setApprovalForAll when the contract is paused", async () => {
+            await instance.pause({from: owner})
+            try {
+                let isApproved = crypto.randomInt(2) === 1
+                let result = await instance.setApprovalForAll(operator, isApproved, {from: owner})
+
+                await approveForAllShouldSucceed(instance, result, owner, operator, isApproved)
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
     })
 
     describe('safeTransferFrom', function () {
@@ -365,5 +482,19 @@ contract('ERC1155', (accounts) => {
                 shouldErrorContainMessage(e, ERC1155_TRANSFER_TO_ZERO_ADDRESS)
             }
         });
+
+        it("should not be able to safeTransferFrom when the contract is paused", async () => {
+            let supply = crypto.randomInt(10000)
+            let res = await ERC1155_mintRandomToken(instance, owner, supply)
+            let tokenID = res.logs[0].args.id
+            await instance.pause({from: owner})
+            try {
+                await instance.safeTransferFrom(owner, ZERO_ADDRESS, tokenID, 1, '0x')
+                shouldNotPass()
+            } catch (e) {
+                shouldErrorContainMessage(e, PAUSABLE_PAUSED)
+                await instance.unPause({from: owner})
+            }
+        })
     });
 })
