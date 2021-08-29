@@ -12,7 +12,7 @@ $ npm install
 ```
 
 ## How to deploy
-1. Copy your BSC secret key into file [.secret](./.secret)
+1. Copy your BSC secret key into file [.secret](./.secret) (remember not to commit it)
 2. Compile the project
 ```shell
 $ truffle compile
