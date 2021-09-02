@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "flat:TaureumERC721": "truffle-flattener ./contracts/tokens/ERC721/TaureumERC721LazyMint.sol > ./publish/TaureumERC721LazyMint.flat.sol",
+    "flat:TaureumERC1155": "truffle-flattener ./contracts/tokens/ERC1155/TaureumERC721LazyMint.sol > ./publish/TaureumERC1155LazyMint.flat.sol",
+    "test": "truffle test && exit 1"
+  },
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.12",
     "@truffle/hdwallet-provider": "^1.4.1",
